@@ -241,13 +241,45 @@ main {
   box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
 }
 
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #e7f0ff;
+}
+
+.tab-button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tab-button.active {
+  background: var(--surface);
+  color: var(--accent-strong);
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.12);
+}
+
 .view,
-.master-view {
+.master-view,
+.tab-panel {
   display: none;
 }
 
 .view.active,
-.master-view.active {
+.master-view.active,
+.tab-panel.active {
   display: block;
 }
 
@@ -679,6 +711,11 @@ textarea {
   gap: 10px;
 }
 
+.item-header > :first-child,
+.check-item span {
+  min-width: 0;
+}
+
 .item-title {
   margin: 0 0 4px;
   font-size: 16px;
@@ -687,6 +724,7 @@ textarea {
 
 .item-actions {
   display: flex;
+  flex: 0 0 auto;
   gap: 6px;
 }
 
@@ -743,6 +781,7 @@ textarea {
 }
 
 .mini-button {
+  width: 38px;
   min-width: 38px;
   min-height: 34px;
   border: 1px solid var(--line);

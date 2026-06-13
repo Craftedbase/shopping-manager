@@ -15,6 +15,7 @@
         category: "食品",
         amount: 1000,
         unitId: "u-ml",
+        stockUnit: "本",
         stock: 1,
         minStock: 2,
         image: "",
@@ -26,6 +27,7 @@
         category: "食品",
         amount: 400,
         unitId: "u-g",
+        stockUnit: "個",
         stock: 2,
         minStock: 1,
         image: "",
@@ -37,6 +39,7 @@
         category: "日用品",
         amount: 900,
         unitId: "u-ml",
+        stockUnit: "本",
         stock: 0,
         minStock: 1,
         image: "",
@@ -48,6 +51,7 @@
         category: "食品",
         amount: 5000,
         unitId: "u-g",
+        stockUnit: "袋",
         stock: 1,
         minStock: 1,
         image: "",
@@ -59,7 +63,20 @@
         category: "日用品",
         amount: 5,
         unitId: "u-count",
+        stockUnit: "パック",
         stock: 1,
+        minStock: 2,
+        image: "",
+        favorite: false
+      },
+      {
+        id: "sample-snack",
+        name: "ポテトチップス 50g",
+        category: "お菓子",
+        amount: 50,
+        unitId: "u-g",
+        stockUnit: "袋",
+        stock: 3,
         minStock: 2,
         image: "",
         favorite: false
@@ -151,6 +168,15 @@
         quantity: 1,
         price: 198,
         note: "特売"
+      },
+      {
+        id: "sample-purchase-010",
+        date: "2026-06-11",
+        productId: "sample-snack",
+        storeId: "sample-store-c",
+        quantity: 2,
+        price: 196,
+        note: "2袋"
       }
     ],
     shoppingItems: [
@@ -176,6 +202,7 @@
         id: "sample-stock-001",
         productId: "sample-milk",
         productName: "牛乳 1L",
+        stockUnit: "本",
         before: 2,
         after: 1,
         reason: "在庫を減少",
@@ -185,6 +212,7 @@
         id: "sample-stock-002",
         productId: "sample-detergent",
         productName: "洗濯洗剤 900ml",
+        stockUnit: "本",
         before: 1,
         after: 0,
         reason: "在庫数を編集",
@@ -194,6 +222,7 @@
         id: "sample-stock-003",
         productId: "sample-tissue",
         productName: "ティッシュ 5箱",
+        stockUnit: "パック",
         before: 2,
         after: 1,
         reason: "在庫を減少",
@@ -238,7 +267,7 @@
       ...structuredClone(defaultState),
       ...data,
       units: Array.isArray(data.units) && data.units.length ? data.units : structuredClone(defaultState.units),
-      products: Array.isArray(data.products) ? data.products : [],
+      products: Array.isArray(data.products) ? data.products.map(normalizeProduct) : [],
       stores: Array.isArray(data.stores) ? data.stores : [],
       purchases: Array.isArray(data.purchases) ? data.purchases : [],
       shoppingItems: Array.isArray(data.shoppingItems) ? data.shoppingItems : [],
@@ -255,6 +284,23 @@
       shoppingItems: [],
       stockHistory: []
     };
+  }
+
+  function normalizeProduct(product) {
+    return {
+      ...product,
+      stockUnit: product.stockUnit || inferStockUnit(product)
+    };
+  }
+
+  function inferStockUnit(product) {
+    const name = product?.name || "";
+    if (name.includes("箱")) return "箱";
+    if (name.includes("袋")) return "袋";
+    if (name.includes("パック")) return "パック";
+    if (name.includes("ヨーグルト")) return "個";
+    if (name.includes("米")) return "袋";
+    return "個";
   }
 
   function resetWorkingForms() {
@@ -402,7 +448,7 @@
                 </span>
               </label>
               <div class="item-actions">
-                <button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="買物入力へ">入力</button>
+                <button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="買物入力へ">記</button>
                 <button class="mini-button danger" type="button" data-delete-shopping="${item.id}" aria-label="削除">削</button>
               </div>
             </div>
@@ -447,7 +493,7 @@
                 ${productImageMarkup(product)}
                 <div>
                   <p class="item-title">${escapeHtml(product.name)}</p>
-                  <p class="meta">${escapeHtml(product.category || "未分類")} / ${product.amount}${escapeHtml(unit?.name || "")}</p>
+                  <p class="meta">${escapeHtml(product.category || "未分類")} / 内容量 ${product.amount}${escapeHtml(unit?.name || "")} / 在庫単位 ${escapeHtml(product.stockUnit || "個")}</p>
                 </div>
               </div>
                 <div class="item-actions">
@@ -465,8 +511,8 @@
   function renderInventory() {
     byId("inventoryList").innerHTML = state.products.length
       ? state.products.map((product) => {
-          const unit = unitById(product.unitId);
           const isLow = Number(product.minStock) > 0 && Number(product.stock) <= Number(product.minStock);
+          const stockUnit = product.stockUnit || "個";
           return `
             <article class="item">
               <div class="item-header">
@@ -474,7 +520,7 @@
                   ${productImageMarkup(product)}
                   <div>
                     <p class="item-title">${escapeHtml(product.name)}</p>
-                    <p class="meta">${escapeHtml(product.category || "未分類")} / ${product.amount}${escapeHtml(unit?.name || "")}</p>
+                    <p class="meta">${escapeHtml(product.category || "未分類")} / 現在 ${product.stock || 0}${escapeHtml(stockUnit)} / 最低 ${product.minStock || 0}${escapeHtml(stockUnit)}</p>
                     ${isLow ? "<span class=\"badge danger\">不足</span>" : "<span class=\"badge\">在庫あり</span>"}
                   </div>
                 </div>
@@ -698,8 +744,7 @@
     byId("stockHistoryList").innerHTML = histories.length
       ? histories.map((history) => {
           const product = productById(history.productId);
-          const unit = product ? unitById(product.unitId) : null;
-          const unitName = unit?.name || "";
+          const unitName = product?.stockUnit || history.stockUnit || "";
           const diff = Number(history.after) - Number(history.before);
           const diffLabel = `${diff > 0 ? "+" : ""}${diff}`;
           return `
@@ -750,7 +795,7 @@
     const analysis = getAnalysis().filter((row) => row.entries.length);
 
     if (mode === "lowStock") {
-      return ["在庫不足", "", ...lowStock.map((product) => `- ${product.name}（在庫 ${product.stock} / 最低 ${product.minStock}）`)]
+      return ["在庫不足", "", ...lowStock.map((product) => `- ${product.name}（在庫 ${product.stock}${product.stockUnit || "個"} / 最低 ${product.minStock}${product.stockUnit || "個"}）`)]
         .join("\n")
         .trim() || "在庫不足の商品はありません。";
     }
@@ -835,6 +880,7 @@
     byId("productName").value = "";
     byId("productCategory").value = "";
     byId("productAmount").value = "";
+    byId("productStockUnit").value = "";
     byId("productImage").value = "";
     byId("productImageRemove").checked = false;
     renderProductImagePreview("");
@@ -876,6 +922,12 @@
     });
     document.querySelectorAll("[data-menu-master]").forEach((button) => {
       button.addEventListener("click", () => openMasterView(button.dataset.menuMaster));
+    });
+    document.querySelectorAll("[data-log-tab]").forEach((button) => {
+      button.addEventListener("click", () => setTab("log", button.dataset.logTab));
+    });
+    document.querySelectorAll("[data-inventory-tab]").forEach((button) => {
+      button.addEventListener("click", () => setTab("inventory", button.dataset.inventoryTab));
     });
 
     document.querySelectorAll(".segment").forEach((segment) => {
@@ -946,6 +998,15 @@
     closeMasterForm();
     closeMenu();
     updateActionButton();
+  }
+
+  function setTab(group, tabId) {
+    document.querySelectorAll(`[data-${group}-tab]`).forEach((button) => {
+      button.classList.toggle("active", button.dataset[`${group}Tab`] === tabId);
+    });
+    document.querySelectorAll(`[data-${group}-panel]`).forEach((panel) => {
+      panel.classList.toggle("active", panel.dataset[`${group}Panel`] === tabId);
+    });
   }
 
   function updateSettingsTitle(masterType) {
@@ -1064,6 +1125,7 @@
       category: byId("productCategory").value.trim(),
       amount: Number(byId("productAmount").value),
       unitId: byId("productUnit").value,
+      stockUnit: byId("productStockUnit").value.trim() || "個",
       stock: Number(existing?.stock || 0),
       minStock: Number(existing?.minStock || 0),
       image: shouldRemoveImage ? "" : pendingProductImage || existing?.image || "",
@@ -1195,6 +1257,7 @@
       id: uid("stock"),
       productId: product.id,
       productName: product.name,
+      stockUnit: product.stockUnit || "個",
       before: Number(before),
       after: Number(after),
       reason,
@@ -1389,6 +1452,7 @@
     byId("productCategory").value = product.category || "";
     byId("productAmount").value = product.amount;
     byId("productUnit").value = product.unitId;
+    byId("productStockUnit").value = product.stockUnit || inferStockUnit(product);
     byId("productImage").value = "";
     byId("productImageRemove").checked = false;
     renderProductImagePreview(product.image || "");

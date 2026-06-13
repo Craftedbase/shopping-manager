@@ -105,79 +105,100 @@
         <div class="section-row">
           <h2 id="logTitle">買物入力</h2>
         </div>
-        <form id="purchaseForm" class="panel">
-          <input type="hidden" id="purchaseId">
-          <label>
-            購入日
-            <input id="purchaseDate" type="date" required>
-          </label>
-          <label>
-            商品検索
-            <input id="purchaseProductSearch" class="field-search" type="search" placeholder="商品名・カテゴリで検索">
-          </label>
-          <label>
-            商品
-            <select id="purchaseProduct" required></select>
-          </label>
-          <p id="purchaseHint" class="hint"></p>
-          <label>
-            店舗
-            <select id="purchaseStore" required></select>
-          </label>
-          <div class="form-grid">
+        <div class="tab-bar" role="tablist" aria-label="買物入力メニュー">
+          <button class="tab-button active" type="button" data-log-tab="input">入力</button>
+          <button class="tab-button" type="button" data-log-tab="records">記録一覧</button>
+          <button class="tab-button" type="button" data-log-tab="stores">店舗別</button>
+          <button class="tab-button" type="button" data-log-tab="products">商品別</button>
+          <button class="tab-button" type="button" data-log-tab="calendar">頻度</button>
+        </div>
+        <div class="tab-panel active" data-log-panel="input">
+          <form id="purchaseForm" class="panel">
+            <input type="hidden" id="purchaseId">
             <label>
-              数量
-              <input id="purchaseQuantity" type="number" min="0.01" step="0.01" value="1" required>
+              購入日
+              <input id="purchaseDate" type="date" required>
             </label>
             <label>
-              税込価格
-              <input id="purchasePrice" type="number" min="0" step="1" inputmode="numeric" required>
+              商品検索
+              <input id="purchaseProductSearch" class="field-search" type="search" placeholder="商品名・カテゴリで検索">
             </label>
-          </div>
-          <label>
-            メモ
-            <input id="purchaseNote" type="text" placeholder="特売、クーポンなど">
-          </label>
-          <label class="check-row">
-            <input id="purchaseContinuous" type="checkbox" checked>
-            <span>連続入力する（日付と店舗を残す）</span>
-          </label>
-          <p id="purchaseStatus" class="status" role="status"></p>
-          <div class="actions">
-            <button class="primary-button" type="submit">保存</button>
-            <button id="cancelPurchaseEdit" class="secondary-button" type="button">クリア</button>
-          </div>
-        </form>
-
-        <div class="section-row">
-          <h3>記録一覧</h3>
-          <input id="purchaseSearch" class="search" type="search" placeholder="商品・店舗で検索">
+            <label>
+              商品
+              <select id="purchaseProduct" required></select>
+            </label>
+            <p id="purchaseHint" class="hint"></p>
+            <label>
+              店舗
+              <select id="purchaseStore" required></select>
+            </label>
+            <div class="form-grid">
+              <label>
+                数量
+                <input id="purchaseQuantity" type="number" min="0.01" step="0.01" value="1" required>
+              </label>
+              <label>
+                税込価格
+                <input id="purchasePrice" type="number" min="0" step="1" inputmode="numeric" required>
+              </label>
+            </div>
+            <label>
+              メモ
+              <input id="purchaseNote" type="text" placeholder="特売、クーポンなど">
+            </label>
+            <label class="check-row">
+              <input id="purchaseContinuous" type="checkbox" checked>
+              <span>連続入力する（日付と店舗を残す）</span>
+            </label>
+            <p id="purchaseStatus" class="status" role="status"></p>
+            <div class="actions">
+              <button class="primary-button" type="submit">保存</button>
+              <button id="cancelPurchaseEdit" class="secondary-button" type="button">クリア</button>
+            </div>
+          </form>
         </div>
-        <div id="purchaseList" class="list"></div>
-
-        <h3>店舗別購入履歴</h3>
-        <div id="storeHistoryList" class="list compact-list"></div>
-
-        <h3>商品別購入店舗履歴</h3>
-        <div id="productStoreHistoryList" class="list compact-list"></div>
-
-        <div class="section-row">
-          <h3>購入カレンダー</h3>
-          <input id="purchaseCalendarMonth" class="month-input" type="month">
+        <div class="tab-panel" data-log-panel="records">
+          <div class="section-row">
+            <h3>記録一覧</h3>
+            <input id="purchaseSearch" class="search" type="search" placeholder="商品・店舗で検索">
+          </div>
+          <div id="purchaseList" class="list"></div>
         </div>
-        <div id="purchaseCalendar" class="calendar-grid"></div>
-        <h3>購入頻度</h3>
-        <div id="purchaseFrequencyList" class="list compact-list"></div>
+        <div class="tab-panel" data-log-panel="stores">
+          <h3>店舗別購入履歴</h3>
+          <div id="storeHistoryList" class="list compact-list"></div>
+        </div>
+        <div class="tab-panel" data-log-panel="products">
+          <h3>商品別購入店舗履歴</h3>
+          <div id="productStoreHistoryList" class="list compact-list"></div>
+        </div>
+        <div class="tab-panel" data-log-panel="calendar">
+          <div class="section-row">
+            <h3>購入カレンダー</h3>
+            <input id="purchaseCalendarMonth" class="month-input" type="month">
+          </div>
+          <div id="purchaseCalendar" class="calendar-grid"></div>
+          <h3>購入頻度</h3>
+          <div id="purchaseFrequencyList" class="list compact-list"></div>
+        </div>
       </section>
 
       <section id="inventory" class="view" aria-labelledby="inventoryTitle">
         <div class="section-row">
           <h2 id="inventoryTitle">在庫管理</h2>
         </div>
-        <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位は設定で編集します。</p>
-        <div id="inventoryList" class="list"></div>
-        <h3>在庫変更履歴</h3>
-        <div id="stockHistoryList" class="list compact-list"></div>
+        <div class="tab-bar" role="tablist" aria-label="在庫管理メニュー">
+          <button class="tab-button active" type="button" data-inventory-tab="stock">在庫</button>
+          <button class="tab-button" type="button" data-inventory-tab="history">変更履歴</button>
+        </div>
+        <div class="tab-panel active" data-inventory-panel="stock">
+          <p class="note">現在在庫と最低在庫はここで管理します。価格比較用の内容量単位とは別に、商品登録の在庫単位で表示します。</p>
+          <div id="inventoryList" class="list"></div>
+        </div>
+        <div class="tab-panel" data-inventory-panel="history">
+          <h3>在庫変更履歴</h3>
+          <div id="stockHistoryList" class="list compact-list"></div>
+        </div>
       </section>
 
       <section id="masters" class="view" aria-labelledby="mastersTitle">
@@ -203,10 +224,14 @@
                 <input id="productAmount" type="number" min="0.01" step="0.01" required>
               </label>
               <label>
-                単位
+                内容量単位
                 <select id="productUnit" required></select>
               </label>
             </div>
+            <label>
+              在庫単位
+              <input id="productStockUnit" type="text" required placeholder="本 / 個 / 袋 / 箱">
+            </label>
             <label>
               商品画像
               <input id="productImage" type="file" accept="image/*">
@@ -333,7 +358,7 @@
           </section>
           <section class="help-block">
             <h3>在庫管理</h3>
-            <p>現在在庫と最低在庫を手動で管理します。在庫が最低在庫以下になると買い物リストに自動追加されます。</p>
+            <p>現在在庫と最低在庫を手動で管理します。在庫は商品登録で設定した在庫単位、本、個、袋、箱などで表示します。</p>
             <p>在庫数を変更すると、変更前後の数量と日時が在庫変更履歴に残ります。</p>
           </section>
           <section class="help-block">
@@ -343,7 +368,7 @@
           <section class="help-block">
             <h3>設定</h3>
             <p>三本線メニューから商品登録、単位登録、店舗登録を開けます。各画面では右下の＋ボタンから追加し、一覧の編集ボタンから修正できます。</p>
-            <p>商品と店舗には画像を登録できます。単位は単位価格の計算基準として使われます。</p>
+            <p>商品と店舗には画像を登録できます。内容量単位は単位価格の計算に使い、在庫単位は在庫数の表示と管理に使います。</p>
           </section>
           <section class="help-block">
             <h3>バックアップ</h3>
