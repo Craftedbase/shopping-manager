@@ -1,10 +1,14 @@
-const CACHE_NAME = "shopping-manager-pwa-v16";
+const CACHE_NAME = "shopping-manager-pwa-v19";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
   "./manifest.json",
+  "./icons/list.png",
+  "./icons/input.png",
+  "./icons/stock.png",
+  "./icons/price.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon.svg"
