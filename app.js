@@ -257,6 +257,24 @@
     };
   }
 
+  function resetWorkingForms() {
+    pendingProductImage = "";
+    pendingStoreImage = "";
+    linkedShoppingItemId = "";
+    resetPurchaseForm();
+    resetProductForm();
+    resetStoreForm();
+    resetUnitForm();
+    resetShoppingForm();
+    closeShoppingPanel();
+    closeMasterForm();
+    byId("purchaseSearch").value = "";
+    byId("productSearch").value = "";
+    byId("purchaseProductSearch").value = "";
+    byId("shoppingProductSearch").value = "";
+    byId("purchaseCalendarMonth").value = today().slice(0, 7);
+  }
+
   function saveState() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -908,6 +926,7 @@
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
     byId("exportBackup").addEventListener("click", exportBackup);
     byId("importBackup").addEventListener("change", importBackup);
+    byId("loadSampleData").addEventListener("click", loadSampleData);
     byId("initializeData").addEventListener("click", initializeData);
     byId("openActionButton").addEventListener("click", openActionPanel);
     document.querySelectorAll("[data-close-shopping-panel]").forEach((button) => {
@@ -1546,16 +1565,8 @@
       if (!shouldRestore) return;
 
       state = restoredState;
-      pendingProductImage = "";
-      pendingStoreImage = "";
       saveState();
-      resetPurchaseForm();
-      resetProductForm();
-      resetStoreForm();
-      resetUnitForm();
-      resetShoppingForm();
-      closeShoppingPanel();
-      closeMasterForm();
+      resetWorkingForms();
       renderAll();
       byId("backupStatus").textContent = "バックアップから復元しました。";
     } catch {
@@ -1564,6 +1575,30 @@
     } finally {
       event.target.value = "";
     }
+  }
+
+  function loadSampleData() {
+    closeMenu();
+    const shouldLoad = confirm("現在のデータをサンプルデータで上書きします。よろしいですか？");
+    if (!shouldLoad) return;
+
+    const shouldBackup = confirm("サンプルデータ投入前にバックアップしますか？");
+    if (shouldBackup) {
+      exportBackup({
+        prefix: "stumane-backup-before-sample",
+        status: "サンプルデータ投入前バックアップファイルを作成しました。"
+      });
+    }
+
+    const finalConfirm = confirm("サンプルデータを投入します。現在のデータはサンプルデータに置き換わります。");
+    if (!finalConfirm) return;
+
+    state = structuredClone(defaultState);
+    saveState();
+    resetWorkingForms();
+    renderAll();
+    switchView("home");
+    alert("サンプルデータを投入しました。");
   }
 
   function initializeData() {
@@ -1583,20 +1618,8 @@
     if (!finalConfirm) return;
 
     state = createEmptyState();
-    pendingProductImage = "";
-    pendingStoreImage = "";
-    linkedShoppingItemId = "";
     saveState();
-    resetPurchaseForm();
-    resetProductForm();
-    resetStoreForm();
-    resetUnitForm();
-    resetShoppingForm();
-    closeShoppingPanel();
-    closeMasterForm();
-    byId("purchaseSearch").value = "";
-    byId("productSearch").value = "";
-    byId("purchaseCalendarMonth").value = today().slice(0, 7);
+    resetWorkingForms();
     renderAll();
     switchView("home");
     alert("初期化しました。");
