@@ -181,26 +181,31 @@ main {
   padding: 12px 12px 92px;
 }
 
-.tabs {
-  position: sticky;
-  top: 92px;
-  z-index: 4;
-  display: flex;
-  overflow-x: auto;
-  gap: 4px;
-  padding: 6px;
-  margin-bottom: 16px;
-  background: #e7f0ff;
+.home-menu {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.home-menu-button {
+  display: grid;
+  place-items: center;
+  min-height: 118px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  scrollbar-width: none;
+  background: var(--surface);
+  color: var(--accent-strong);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  font-size: 17px;
+  font-weight: 900;
 }
 
-.tabs::-webkit-scrollbar {
-  display: none;
+.home-menu-button:active {
+  background: var(--surface-strong);
+  transform: translateY(1px);
 }
 
-.tab,
 .segment {
   flex: 0 0 auto;
   min-width: 96px;
@@ -212,7 +217,6 @@ main {
   font-weight: 700;
 }
 
-.tab.active,
 .segment.active {
   background: var(--surface);
   color: var(--accent-strong);
@@ -360,6 +364,14 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .actions button {
@@ -644,13 +656,9 @@ textarea {
 }
 
 @media (max-width: 420px) {
-  .tabs {
-    top: 92px;
-  }
-
-  .tab {
-    min-height: 38px;
-    font-size: 12px;
+  .home-menu-button {
+    min-height: 104px;
+    font-size: 16px;
   }
 
   .form-grid {

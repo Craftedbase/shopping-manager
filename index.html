@@ -33,17 +33,31 @@
     </div>
 
     <main>
-      <nav class="tabs" aria-label="主要画面">
-        <button class="tab active" type="button" data-view="shopping">買い物リスト</button>
-        <button class="tab" type="button" data-view="log">買い物入力</button>
-        <button class="tab" type="button" data-view="inventory">在庫管理</button>
-        <button class="tab" type="button" data-view="analysis">最安値</button>
-      </nav>
+      <section id="home" class="view active" aria-labelledby="homeTitle">
+        <h2 id="homeTitle">ホーム</h2>
+        <div class="home-menu" aria-label="主要機能">
+          <button class="home-menu-button" type="button" data-view-target="shopping">
+            <span>買い物リスト</span>
+          </button>
+          <button class="home-menu-button" type="button" data-view-target="log">
+            <span>買い物入力</span>
+          </button>
+          <button class="home-menu-button" type="button" data-view-target="inventory">
+            <span>在庫管理</span>
+          </button>
+          <button class="home-menu-button" type="button" data-view-target="analysis">
+            <span>最安値</span>
+          </button>
+        </div>
+      </section>
 
-      <section id="shopping" class="view active" aria-labelledby="shoppingTitle">
+      <section id="shopping" class="view" aria-labelledby="shoppingTitle">
         <div class="section-row">
           <h2 id="shoppingTitle">買い物リスト</h2>
-          <button id="clearCheckedItems" class="text-button" type="button">購入済み整理</button>
+          <div class="section-actions">
+            <button class="text-button" type="button" data-view-target="home">ホームへ</button>
+            <button id="clearCheckedItems" class="text-button" type="button">購入済み整理</button>
+          </div>
         </div>
         <div id="shoppingList" class="list"></div>
       </section>
@@ -77,7 +91,10 @@
       </section>
 
       <section id="log" class="view" aria-labelledby="logTitle">
-        <h2 id="logTitle">買物入力</h2>
+        <div class="section-row">
+          <h2 id="logTitle">買物入力</h2>
+          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
+        </div>
         <form id="purchaseForm" class="panel">
           <input type="hidden" id="purchaseId">
           <label>
@@ -127,13 +144,19 @@
       </section>
 
       <section id="inventory" class="view" aria-labelledby="inventoryTitle">
-        <h2 id="inventoryTitle">在庫管理</h2>
+        <div class="section-row">
+          <h2 id="inventoryTitle">在庫管理</h2>
+          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
+        </div>
         <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位は設定で編集します。</p>
         <div id="inventoryList" class="list"></div>
       </section>
 
       <section id="masters" class="view" aria-labelledby="mastersTitle">
-        <h2 id="mastersTitle">商品登録</h2>
+        <div class="section-row">
+          <h2 id="mastersTitle">商品登録</h2>
+          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
+        </div>
         <div id="masterFormBackdrop" class="master-form-backdrop" data-close-master-form></div>
 
         <div id="productsMaster" class="master-view active">
@@ -231,7 +254,10 @@
       </section>
 
       <section id="analysis" class="view" aria-labelledby="analysisTitle">
-        <h2 id="analysisTitle">最安値分析</h2>
+        <div class="section-row">
+          <h2 id="analysisTitle">最安値</h2>
+          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
+        </div>
         <p class="note">商品の内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
         <div id="analysisList" class="list"></div>
       </section>

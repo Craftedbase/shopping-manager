@@ -497,8 +497,8 @@
   }
 
   function addEventListeners() {
-    document.querySelectorAll(".tab").forEach((tab) => {
-      tab.addEventListener("click", () => switchView(tab.dataset.view));
+    document.querySelectorAll("[data-view-target]").forEach((button) => {
+      button.addEventListener("click", () => switchView(button.dataset.viewTarget));
     });
 
     byId("menuButton").addEventListener("click", openMenu);
@@ -558,7 +558,6 @@
   }
 
   function switchView(viewId) {
-    document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
     document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
     closeShoppingPanel();
     closeMasterForm();

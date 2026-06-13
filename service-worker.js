@@ -1,4 +1,4 @@
-const CACHE_NAME = "shopping-manager-pwa-v9";
+const CACHE_NAME = "shopping-manager-pwa-v10";
 const APP_SHELL = [
   "./",
   "./index.html",
