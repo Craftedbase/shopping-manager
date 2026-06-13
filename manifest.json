@@ -1,7 +1,7 @@
 {
-  "name": "買い物管理",
-  "short_name": "買い物",
-  "description": "購入ログ、在庫、最安値店舗を管理する買い物管理アプリ",
+  "name": "Stock Manager",
+  "short_name": "Stock",
+  "description": "購入ログ、在庫、最安値店舗を管理するStock Managerアプリ",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
