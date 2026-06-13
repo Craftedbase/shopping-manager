@@ -30,6 +30,8 @@
         <button class="menu-item" type="button" data-menu-master="units">単位登録</button>
         <button class="menu-item" type="button" data-menu-master="stores">店舗登録</button>
         <button class="menu-item" type="button" data-view-target="backup">バックアップ</button>
+        <button class="menu-item" type="button" data-view-target="help">ヘルプ</button>
+        <button id="initializeData" class="menu-item danger-menu-item" type="button">初期化</button>
       </div>
     </div>
 
@@ -157,6 +159,14 @@
 
         <h3>商品別購入店舗履歴</h3>
         <div id="productStoreHistoryList" class="list compact-list"></div>
+
+        <div class="section-row">
+          <h3>購入カレンダー</h3>
+          <input id="purchaseCalendarMonth" class="month-input" type="month">
+        </div>
+        <div id="purchaseCalendar" class="calendar-grid"></div>
+        <h3>購入頻度</h3>
+        <div id="purchaseFrequencyList" class="list compact-list"></div>
       </section>
 
       <section id="inventory" class="view" aria-labelledby="inventoryTitle">
@@ -165,6 +175,8 @@
         </div>
         <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位は設定で編集します。</p>
         <div id="inventoryList" class="list"></div>
+        <h3>在庫変更履歴</h3>
+        <div id="stockHistoryList" class="list compact-list"></div>
       </section>
 
       <section id="masters" class="view" aria-labelledby="mastersTitle">
@@ -291,6 +303,51 @@
             <input id="importBackup" type="file" accept="application/json,.json">
           </label>
           <p id="backupStatus" class="status" role="status"></p>
+        </div>
+      </section>
+
+      <section id="help" class="view" aria-labelledby="helpTitle">
+        <div class="section-row">
+          <h2 id="helpTitle">ヘルプ</h2>
+        </div>
+        <div class="panel help-panel">
+          <section class="help-block">
+            <h3>ホーム</h3>
+            <p>主要機能を開く画面です。買い物リスト、買い物入力、在庫管理、最安値を選択できます。左下の家マークでいつでもホームへ戻れます。</p>
+          </section>
+          <section class="help-block">
+            <h3>買い物リスト</h3>
+            <p>買う予定の商品を管理します。在庫が最低在庫以下の商品は自動で表示されます。右下の＋ボタンから手動追加できます。</p>
+            <p>リスト内の「入力」を押すと買物入力へ移動し、商品と店舗候補を引き継げます。保存するとリスト側は購入済みになります。</p>
+          </section>
+          <section class="help-block">
+            <h3>買い物入力</h3>
+            <p>購入日、商品、店舗、数量、税込価格を入力して購入ログを保存します。商品検索で商品名やカテゴリから候補を絞り込めます。</p>
+            <p>連続入力をオンにすると、保存後も日付と店舗を残して次の商品を続けて入力できます。</p>
+          </section>
+          <section class="help-block">
+            <h3>購入履歴と頻度</h3>
+            <p>買い物入力画面では記録一覧、店舗別履歴、商品別購入店舗履歴、購入カレンダー、購入頻度を確認できます。</p>
+            <p>購入頻度では、商品ごとの購入回数、最終購入日、平均して何日に1回購入しているかを表示します。</p>
+          </section>
+          <section class="help-block">
+            <h3>在庫管理</h3>
+            <p>現在在庫と最低在庫を手動で管理します。在庫が最低在庫以下になると買い物リストに自動追加されます。</p>
+            <p>在庫数を変更すると、変更前後の数量と日時が在庫変更履歴に残ります。</p>
+          </section>
+          <section class="help-block">
+            <h3>最安値</h3>
+            <p>購入ログの税込価格、数量、商品単位をもとに単位価格を自動計算し、商品ごとの最安値店舗を表示します。</p>
+          </section>
+          <section class="help-block">
+            <h3>設定</h3>
+            <p>三本線メニューから商品登録、単位登録、店舗登録を開けます。各画面では右下の＋ボタンから追加し、一覧の編集ボタンから修正できます。</p>
+            <p>商品と店舗には画像を登録できます。単位は単位価格の計算基準として使われます。</p>
+          </section>
+          <section class="help-block">
+            <h3>バックアップ</h3>
+            <p>バックアップ作成でスマホ内のデータをJSONファイルとして保存できます。復元ではバックアップファイルを選択し、現在のデータを上書きできます。</p>
+          </section>
         </div>
       </section>
 

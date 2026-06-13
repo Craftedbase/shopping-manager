@@ -8,15 +8,204 @@
       { id: "u-count", name: "個", base: 1 },
       { id: "u-pack", name: "袋", base: 1 }
     ],
-    products: [],
-    stores: [],
-    purchases: [],
-    shoppingItems: []
+    products: [
+      {
+        id: "sample-milk",
+        name: "牛乳 1L",
+        category: "食品",
+        amount: 1000,
+        unitId: "u-ml",
+        stock: 1,
+        minStock: 2,
+        image: "",
+        favorite: true
+      },
+      {
+        id: "sample-yogurt",
+        name: "プレーンヨーグルト 400g",
+        category: "食品",
+        amount: 400,
+        unitId: "u-g",
+        stock: 2,
+        minStock: 1,
+        image: "",
+        favorite: true
+      },
+      {
+        id: "sample-detergent",
+        name: "洗濯洗剤 900ml",
+        category: "日用品",
+        amount: 900,
+        unitId: "u-ml",
+        stock: 0,
+        minStock: 1,
+        image: "",
+        favorite: false
+      },
+      {
+        id: "sample-rice",
+        name: "無洗米 5kg",
+        category: "食品",
+        amount: 5000,
+        unitId: "u-g",
+        stock: 1,
+        minStock: 1,
+        image: "",
+        favorite: false
+      },
+      {
+        id: "sample-tissue",
+        name: "ティッシュ 5箱",
+        category: "日用品",
+        amount: 5,
+        unitId: "u-count",
+        stock: 1,
+        minStock: 2,
+        image: "",
+        favorite: false
+      }
+    ],
+    stores: [
+      { id: "sample-store-a", name: "青空スーパー", type: "スーパー", image: "", favorite: true },
+      { id: "sample-store-b", name: "駅前ドラッグ", type: "ドラッグストア", image: "", favorite: true },
+      { id: "sample-store-c", name: "週末マーケット", type: "スーパー", image: "", favorite: false }
+    ],
+    purchases: [
+      {
+        id: "sample-purchase-001",
+        date: "2026-06-12",
+        productId: "sample-milk",
+        storeId: "sample-store-a",
+        quantity: 1,
+        price: 218,
+        note: "通常価格"
+      },
+      {
+        id: "sample-purchase-002",
+        date: "2026-06-09",
+        productId: "sample-yogurt",
+        storeId: "sample-store-b",
+        quantity: 1,
+        price: 168,
+        note: "アプリクーポン"
+      },
+      {
+        id: "sample-purchase-003",
+        date: "2026-06-05",
+        productId: "sample-milk",
+        storeId: "sample-store-c",
+        quantity: 1,
+        price: 205,
+        note: "週末特売"
+      },
+      {
+        id: "sample-purchase-004",
+        date: "2026-06-03",
+        productId: "sample-tissue",
+        storeId: "sample-store-b",
+        quantity: 1,
+        price: 328,
+        note: "まとめ買い候補"
+      },
+      {
+        id: "sample-purchase-005",
+        date: "2026-05-29",
+        productId: "sample-detergent",
+        storeId: "sample-store-b",
+        quantity: 1,
+        price: 398,
+        note: "詰替"
+      },
+      {
+        id: "sample-purchase-006",
+        date: "2026-05-25",
+        productId: "sample-milk",
+        storeId: "sample-store-a",
+        quantity: 1,
+        price: 218,
+        note: ""
+      },
+      {
+        id: "sample-purchase-007",
+        date: "2026-05-20",
+        productId: "sample-rice",
+        storeId: "sample-store-c",
+        quantity: 1,
+        price: 2380,
+        note: "5kg"
+      },
+      {
+        id: "sample-purchase-008",
+        date: "2026-05-18",
+        productId: "sample-yogurt",
+        storeId: "sample-store-a",
+        quantity: 1,
+        price: 188,
+        note: ""
+      },
+      {
+        id: "sample-purchase-009",
+        date: "2026-05-11",
+        productId: "sample-milk",
+        storeId: "sample-store-b",
+        quantity: 1,
+        price: 198,
+        note: "特売"
+      }
+    ],
+    shoppingItems: [
+      {
+        id: "sample-shopping-001",
+        productId: "sample-yogurt",
+        name: "プレーンヨーグルト 400g",
+        storeId: "sample-store-b",
+        checked: false,
+        source: "manual"
+      },
+      {
+        id: "sample-shopping-002",
+        productId: "",
+        name: "卵 10個",
+        storeId: "",
+        checked: false,
+        source: "manual"
+      }
+    ],
+    stockHistory: [
+      {
+        id: "sample-stock-001",
+        productId: "sample-milk",
+        productName: "牛乳 1L",
+        before: 2,
+        after: 1,
+        reason: "在庫を減少",
+        changedAt: "2026-06-12T20:15:00"
+      },
+      {
+        id: "sample-stock-002",
+        productId: "sample-detergent",
+        productName: "洗濯洗剤 900ml",
+        before: 1,
+        after: 0,
+        reason: "在庫数を編集",
+        changedAt: "2026-06-10T09:30:00"
+      },
+      {
+        id: "sample-stock-003",
+        productId: "sample-tissue",
+        productName: "ティッシュ 5箱",
+        before: 2,
+        after: 1,
+        reason: "在庫を減少",
+        changedAt: "2026-06-08T18:05:00"
+      }
+    ]
   };
 
   let state = loadState();
   let pendingProductImage = "";
   let pendingStoreImage = "";
+  let linkedShoppingItemId = "";
 
   const yen = new Intl.NumberFormat("ja-JP", {
     style: "currency",
@@ -52,7 +241,19 @@
       products: Array.isArray(data.products) ? data.products : [],
       stores: Array.isArray(data.stores) ? data.stores : [],
       purchases: Array.isArray(data.purchases) ? data.purchases : [],
-      shoppingItems: Array.isArray(data.shoppingItems) ? data.shoppingItems : []
+      shoppingItems: Array.isArray(data.shoppingItems) ? data.shoppingItems : [],
+      stockHistory: Array.isArray(data.stockHistory) ? data.stockHistory : []
+    };
+  }
+
+  function createEmptyState() {
+    return {
+      ...structuredClone(defaultState),
+      products: [],
+      stores: [],
+      purchases: [],
+      shoppingItems: [],
+      stockHistory: []
     };
   }
 
@@ -183,6 +384,7 @@
                 </span>
               </label>
               <div class="item-actions">
+                <button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="買物入力へ">入力</button>
                 <button class="mini-button danger" type="button" data-delete-shopping="${item.id}" aria-label="削除">削</button>
               </div>
             </div>
@@ -395,6 +597,108 @@
       : "<div class=\"empty\">購入ログを登録すると商品別の店舗履歴が表示されます。</div>";
   }
 
+  function renderPurchaseCalendar() {
+    const monthInput = byId("purchaseCalendarMonth");
+    const month = monthInput.value || today().slice(0, 7);
+    if (!monthInput.value) monthInput.value = month;
+
+    const [year, monthNumber] = month.split("-").map(Number);
+    const firstDate = new Date(year, monthNumber - 1, 1);
+    const lastDate = new Date(year, monthNumber, 0);
+    const startBlankDays = firstDate.getDay();
+    const purchasesByDate = new Map();
+
+    state.purchases
+      .filter((purchase) => purchase.date.startsWith(month))
+      .forEach((purchase) => {
+        if (!purchasesByDate.has(purchase.date)) purchasesByDate.set(purchase.date, []);
+        purchasesByDate.get(purchase.date).push(purchase);
+      });
+
+    const cells = ["日", "月", "火", "水", "木", "金", "土"].map((day) => `<div class="calendar-weekday">${day}</div>`);
+    for (let index = 0; index < startBlankDays; index += 1) {
+      cells.push("<div class=\"calendar-day empty-day\"></div>");
+    }
+    for (let day = 1; day <= lastDate.getDate(); day += 1) {
+      const date = `${month}-${String(day).padStart(2, "0")}`;
+      const purchases = purchasesByDate.get(date) || [];
+      cells.push(`
+        <div class="calendar-day ${purchases.length ? "has-purchase" : ""}">
+          <span class="calendar-date">${day}</span>
+          ${purchases.length ? `<span class="calendar-count">${purchases.length}件</span>` : ""}
+          ${purchases.slice(0, 2).map((purchase) => `
+            <span class="calendar-product">${escapeHtml(productById(purchase.productId)?.name || "削除済み商品")}</span>
+          `).join("")}
+        </div>
+      `);
+    }
+
+    byId("purchaseCalendar").innerHTML = cells.join("");
+  }
+
+  function renderPurchaseFrequency() {
+    const groups = state.products.map((product) => {
+      const dates = [...new Set(state.purchases
+        .filter((purchase) => purchase.productId === product.id)
+        .map((purchase) => purchase.date))]
+        .sort();
+      if (!dates.length) return null;
+      const intervals = dates.slice(1).map((date, index) => daysBetween(dates[index], date));
+      const averageInterval = intervals.length
+        ? intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length
+        : null;
+      return {
+        product,
+        count: dates.length,
+        lastDate: dates[dates.length - 1],
+        averageInterval
+      };
+    }).filter(Boolean)
+      .sort((a, b) => b.lastDate.localeCompare(a.lastDate));
+
+    byId("purchaseFrequencyList").innerHTML = groups.length
+      ? groups.map((group) => `
+          <article class="item">
+            <div class="item-main">
+              ${productImageMarkup(group.product)}
+              <div>
+                <p class="item-title">${escapeHtml(group.product.name)}</p>
+                <p class="meta">${group.count}回購入 / 最終 ${group.lastDate}</p>
+                <p class="meta">${group.averageInterval === null ? "購入間隔: まだ算出できません" : `平均 ${Math.round(group.averageInterval)}日に1回`}</p>
+              </div>
+            </div>
+          </article>
+        `).join("")
+      : "<div class=\"empty\">購入ログを登録すると購入頻度が表示されます。</div>";
+  }
+
+  function renderStockHistory() {
+    const histories = [...state.stockHistory]
+      .sort((a, b) => b.changedAt.localeCompare(a.changedAt))
+      .slice(0, 30);
+
+    byId("stockHistoryList").innerHTML = histories.length
+      ? histories.map((history) => {
+          const product = productById(history.productId);
+          const unit = product ? unitById(product.unitId) : null;
+          const unitName = unit?.name || "";
+          const diff = Number(history.after) - Number(history.before);
+          const diffLabel = `${diff > 0 ? "+" : ""}${diff}`;
+          return `
+            <article class="item">
+              <div class="item-header">
+                <div>
+                  <p class="item-title">${escapeHtml(product?.name || history.productName || "削除済み商品")}</p>
+                  <p class="meta">${formatDateTime(history.changedAt)} / ${escapeHtml(history.reason || "在庫変更")}</p>
+                  <p class="meta">${history.before}${escapeHtml(unitName)} → ${history.after}${escapeHtml(unitName)}（${diffLabel}${escapeHtml(unitName)}）</p>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("")
+      : "<div class=\"empty\">在庫を変更すると履歴が表示されます。</div>";
+  }
+
   function renderAnalysis() {
     const rows = getAnalysis().filter((row) => row.entries.length);
     byId("analysisList").innerHTML = rows.length
@@ -479,6 +783,9 @@
     renderAnalysis();
     renderStoreHistory();
     renderProductStoreHistory();
+    renderPurchaseCalendar();
+    renderPurchaseFrequency();
+    renderStockHistory();
     renderPurchaseHint();
     renderShareText();
   }
@@ -495,6 +802,7 @@
     byId("purchasePrice").value = "";
     byId("purchaseNote").value = "";
     byId("purchaseStatus").textContent = "";
+    linkedShoppingItemId = "";
     const recentStoreId = keepDateStore ? selectedStore : getRecentStoreId();
     if (recentStoreId) byId("purchaseStore").value = recentStoreId;
     renderPurchaseHint();
@@ -590,6 +898,7 @@
     });
     byId("shoppingProductSearch").addEventListener("input", renderOptions);
     byId("productSearch").addEventListener("input", renderProducts);
+    byId("purchaseCalendarMonth").addEventListener("change", renderPurchaseCalendar);
     byId("purchaseProduct").addEventListener("change", renderPurchaseHint);
     byId("shareMode").addEventListener("change", renderShareText);
     byId("productImage").addEventListener("change", handleProductImageSelection);
@@ -599,6 +908,7 @@
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
     byId("exportBackup").addEventListener("click", exportBackup);
     byId("importBackup").addEventListener("change", importBackup);
+    byId("initializeData").addEventListener("click", initializeData);
     byId("openActionButton").addEventListener("click", openActionPanel);
     document.querySelectorAll("[data-close-shopping-panel]").forEach((button) => {
       button.addEventListener("click", closeShoppingPanel);
@@ -665,6 +975,7 @@
     const id = byId("purchaseId").value || uid("purchase");
     const existing = state.purchases.find((purchase) => purchase.id === id);
     const isContinuous = !existing && byId("purchaseContinuous").checked;
+    const linkedItemId = !existing ? linkedShoppingItemId : "";
     const purchase = {
       id,
       date: byId("purchaseDate").value,
@@ -681,6 +992,11 @@
       state.purchases.push(purchase);
     }
 
+    if (linkedItemId) {
+      const linkedItem = state.shoppingItems.find((item) => item.id === linkedItemId);
+      if (linkedItem) linkedItem.checked = true;
+    }
+
     saveState();
     resetPurchaseForm({
       keepDateStore: isContinuous,
@@ -688,7 +1004,9 @@
     });
     byId("purchaseStatus").textContent = isContinuous
       ? "保存しました。次の商品を続けて入力できます。"
-      : "保存しました。";
+      : linkedItemId
+        ? "保存しました。買い物リストを購入済みにしました。"
+        : "保存しました。";
     renderAll();
   }
 
@@ -799,7 +1117,9 @@
     const stockStep = target.dataset.stockStep;
     const toggleShopping = target.dataset.toggleShopping;
     const deleteShopping = target.dataset.deleteShopping;
+    const inputShopping = target.dataset.inputShopping;
 
+    if (inputShopping) return fillPurchaseFromShoppingItem(inputShopping);
     if (toggleShopping) return toggleShoppingItem(toggleShopping, target.checked);
     if (deleteShopping) return removeShoppingItem(deleteShopping);
     if (editPurchase) return fillPurchaseForm(editPurchase);
@@ -830,7 +1150,9 @@
   function changeStock(productId, step) {
     const product = productById(productId);
     if (!product) return;
-    product.stock = Math.max(0, Number(product.stock || 0) + step);
+    const before = Number(product.stock || 0);
+    product.stock = Math.max(0, before + step);
+    recordStockHistory(product, before, product.stock, step > 0 ? "在庫を追加" : "在庫を減少");
     saveState();
     renderAll();
   }
@@ -838,9 +1160,28 @@
   function updateProductStock(productId, key, value) {
     const product = productById(productId);
     if (!product) return;
-    product[key] = Math.max(0, value);
+    const before = Number(product[key] || 0);
+    const after = Math.max(0, value);
+    product[key] = after;
+    if (key === "stock") {
+      recordStockHistory(product, before, after, "在庫数を編集");
+    }
     saveState();
     renderAll();
+  }
+
+  function recordStockHistory(product, before, after, reason) {
+    if (Number(before) === Number(after)) return;
+    state.stockHistory.unshift({
+      id: uid("stock"),
+      productId: product.id,
+      productName: product.name,
+      before: Number(before),
+      after: Number(after),
+      reason,
+      changedAt: new Date().toISOString()
+    });
+    state.stockHistory = state.stockHistory.slice(0, 200);
   }
 
   function ensureAutoShoppingItems() {
@@ -870,11 +1211,36 @@
         return {
           ...item,
           name: product?.name || item.name,
+          resolvedStoreId: store?.id || "",
           storeName: store?.name || "店舗未定",
           sourceLabel: item.source === "auto" ? "在庫不足から自動追加" : "手動追加",
           priceLabel: row ? `目安 ${money(row.best.unitPrice)} / ${unitLabel(row.product)}` : ""
         };
       });
+  }
+
+  function fillPurchaseFromShoppingItem(id) {
+    const item = getShoppingItemsWithDetails().find((entry) => entry.id === id);
+    if (!item) return;
+    if (!item.productId || !productById(item.productId)) {
+      alert("購入入力へ連携するには、商品登録済みの商品を選択してください。");
+      return;
+    }
+
+    switchView("log");
+    resetPurchaseForm();
+    linkedShoppingItemId = id;
+    byId("purchaseDate").value = today();
+    byId("purchaseProductSearch").value = "";
+    renderOptions();
+    byId("purchaseProduct").value = item.productId;
+    if (item.resolvedStoreId) byId("purchaseStore").value = item.resolvedStoreId;
+    byId("purchaseQuantity").value = "1";
+    byId("purchasePrice").value = "";
+    byId("purchaseNote").value = item.source === "auto" ? "買い物リストから入力" : "";
+    byId("purchaseStatus").textContent = "買い物リストから入力中です。保存すると購入済みにします。";
+    renderPurchaseHint();
+    setTimeout(() => byId("purchasePrice").focus(), 0);
   }
 
   function toggleShoppingItem(id, checked) {
@@ -1144,7 +1510,7 @@
     await navigator.share({ title: "買い物リスト", text });
   }
 
-  function exportBackup() {
+  function exportBackup(options = {}) {
     const exportedAt = new Date();
     const backup = {
       app: "ストマネ（在庫管理）",
@@ -1157,14 +1523,15 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     const timestamp = exportedAt.toISOString().slice(0, 19).replaceAll(":", "").replace("T", "-");
+    const prefix = options.prefix || "stumane-backup";
 
     link.href = url;
-    link.download = `stumane-backup-${timestamp}.json`;
+    link.download = `${prefix}-${timestamp}.json`;
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    byId("backupStatus").textContent = "バックアップファイルを作成しました。";
+    byId("backupStatus").textContent = options.status || "バックアップファイルを作成しました。";
   }
 
   async function importBackup(event) {
@@ -1199,6 +1566,42 @@
     }
   }
 
+  function initializeData() {
+    closeMenu();
+    const shouldInitialize = confirm("すべてのデータを削除しますが、本当によろしいですか？");
+    if (!shouldInitialize) return;
+
+    const shouldBackup = confirm("初期化前にバックアップしますか？");
+    if (shouldBackup) {
+      exportBackup({
+        prefix: "stumane-backup-before-initialize",
+        status: "初期化前バックアップファイルを作成しました。"
+      });
+    }
+
+    const finalConfirm = confirm("初期化を実行します。商品、店舗、購入ログ、買い物リスト、在庫履歴を削除します。");
+    if (!finalConfirm) return;
+
+    state = createEmptyState();
+    pendingProductImage = "";
+    pendingStoreImage = "";
+    linkedShoppingItemId = "";
+    saveState();
+    resetPurchaseForm();
+    resetProductForm();
+    resetStoreForm();
+    resetUnitForm();
+    resetShoppingForm();
+    closeShoppingPanel();
+    closeMasterForm();
+    byId("purchaseSearch").value = "";
+    byId("productSearch").value = "";
+    byId("purchaseCalendarMonth").value = today().slice(0, 7);
+    renderAll();
+    switchView("home");
+    alert("初期化しました。");
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replaceAll("&", "&amp;")
@@ -1208,7 +1611,20 @@
       .replaceAll("'", "&#039;");
   }
 
+  function daysBetween(startDate, endDate) {
+    const start = new Date(`${startDate}T00:00:00`);
+    const end = new Date(`${endDate}T00:00:00`);
+    return Math.max(0, Math.round((end - start) / 86400000));
+  }
+
+  function formatDateTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+  }
+
   byId("purchaseDate").value = today();
+  byId("purchaseCalendarMonth").value = today().slice(0, 7);
   addEventListeners();
   resetPurchaseForm();
   resetShoppingForm();

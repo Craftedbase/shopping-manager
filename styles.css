@@ -134,10 +134,19 @@ button {
   font-weight: 800;
 }
 
+.danger-menu-item {
+  color: var(--warn);
+}
+
 .menu-item:active,
 .menu-item:hover {
   background: var(--surface-strong);
   color: var(--accent-strong);
+}
+
+.danger-menu-item:active,
+.danger-menu-item:hover {
+  color: var(--warn);
 }
 
 .eyebrow {
@@ -155,10 +164,10 @@ p {
 
 h1 {
   margin-bottom: 0;
-  color: var(--accent-strong);
+  color: var(--ink);
   font-size: 24px;
   line-height: 1.18;
-  text-shadow: 0 2px 6px rgba(37, 99, 235, 0.18);
+  text-shadow: none;
 }
 
 h2 {
@@ -169,6 +178,10 @@ h2 {
 h3 {
   margin-bottom: 10px;
   font-size: 16px;
+}
+
+#homeTitle {
+  color: var(--accent-strong);
 }
 
 main {
@@ -279,6 +292,34 @@ main {
   gap: 12px;
   padding: 14px;
   margin-bottom: 16px;
+}
+
+.help-panel {
+  gap: 16px;
+}
+
+.help-block {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.help-block:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.help-block h3 {
+  margin-bottom: 0;
+  color: var(--accent-strong);
+}
+
+.help-block p {
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 label {
@@ -544,6 +585,77 @@ textarea {
 
 .field-search {
   width: 100%;
+}
+
+.month-input {
+  width: auto;
+  min-width: 150px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.calendar-weekday,
+.calendar-day {
+  min-width: 0;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.calendar-weekday {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.calendar-day {
+  min-height: 76px;
+  padding: 6px 5px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.calendar-day.empty-day {
+  border-color: transparent;
+  background: transparent;
+}
+
+.calendar-day.has-purchase {
+  border-color: rgba(37, 99, 235, 0.4);
+  background: #eef6ff;
+}
+
+.calendar-date,
+.calendar-count,
+.calendar-product {
+  display: block;
+  line-height: 1.25;
+}
+
+.calendar-date {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.calendar-count {
+  color: var(--accent-strong);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.calendar-product {
+  color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .list {
