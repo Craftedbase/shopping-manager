@@ -1,0 +1,32 @@
+{
+  "name": "買い物管理",
+  "short_name": "買い物",
+  "description": "購入ログ、在庫、最安値店舗を管理する買い物管理アプリ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f7f4",
+  "theme_color": "#226b4e",
+  "orientation": "portrait",
+  "lang": "ja-JP",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

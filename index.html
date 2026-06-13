@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#226b4e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="買い物管理">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>買い物管理</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">税込価格・スマホ内保存</p>
+        <h1>買い物管理</h1>
+      </div>
+      <button id="seedButton" class="icon-button" type="button" title="サンプル追加" aria-label="サンプル追加">＋</button>
+    </header>
+
+    <main>
+      <nav class="tabs" aria-label="主要画面">
+        <button class="tab active" type="button" data-view="dashboard">概要</button>
+        <button class="tab" type="button" data-view="shopping">買物</button>
+        <button class="tab" type="button" data-view="log">記録</button>
+        <button class="tab" type="button" data-view="inventory">在庫</button>
+        <button class="tab" type="button" data-view="masters">マスタ</button>
+        <button class="tab" type="button" data-view="analysis">分析</button>
+        <button class="tab" type="button" data-view="share">共有</button>
+      </nav>
+
+      <section id="dashboard" class="view active" aria-labelledby="dashboardTitle">
+        <h2 id="dashboardTitle">概要</h2>
+        <div class="summary-grid">
+          <article class="summary-tile">
+            <span>今月の購入</span>
+            <strong id="monthTotal">0円</strong>
+          </article>
+          <article class="summary-tile">
+            <span>在庫不足</span>
+            <strong id="lowStockCount">0</strong>
+          </article>
+          <article class="summary-tile">
+            <span>登録商品</span>
+            <strong id="productCount">0</strong>
+          </article>
+          <article class="summary-tile">
+            <span>購入ログ</span>
+            <strong id="purchaseCount">0</strong>
+          </article>
+        </div>
+
+        <div class="section-row">
+          <h3>在庫不足</h3>
+          <button class="text-button" type="button" data-jump="share">共有文へ</button>
+        </div>
+        <div id="lowStockList" class="list compact-list"></div>
+
+        <h3>最近の購入</h3>
+        <div id="recentPurchases" class="list compact-list"></div>
+      </section>
+
+      <section id="shopping" class="view" aria-labelledby="shoppingTitle">
+        <h2 id="shoppingTitle">買うものチェックリスト</h2>
+        <form id="shoppingForm" class="panel">
+          <label>
+            商品
+            <select id="shoppingProduct"></select>
+          </label>
+          <label>
+            メモ商品
+            <input id="shoppingName" type="text" placeholder="マスタ未登録の商品">
+          </label>
+          <label>
+            購入予定店舗
+            <select id="shoppingStore"></select>
+          </label>
+          <div class="actions">
+            <button class="primary-button" type="submit">追加</button>
+            <button id="clearCheckedItems" class="secondary-button" type="button">購入済み整理</button>
+          </div>
+        </form>
+        <div id="shoppingList" class="list"></div>
+      </section>
+
+      <section id="log" class="view" aria-labelledby="logTitle">
+        <h2 id="logTitle">購入ログ</h2>
+        <form id="purchaseForm" class="panel">
+          <input type="hidden" id="purchaseId">
+          <label>
+            購入日
+            <input id="purchaseDate" type="date" required>
+          </label>
+          <label>
+            商品
+            <select id="purchaseProduct" required></select>
+          </label>
+          <p id="purchaseHint" class="hint"></p>
+          <label>
+            店舗
+            <select id="purchaseStore" required></select>
+          </label>
+          <div class="form-grid">
+            <label>
+              数量
+              <input id="purchaseQuantity" type="number" min="0.01" step="0.01" value="1" required>
+            </label>
+            <label>
+              税込価格
+              <input id="purchasePrice" type="number" min="0" step="1" inputmode="numeric" required>
+            </label>
+          </div>
+          <label>
+            メモ
+            <input id="purchaseNote" type="text" placeholder="特売、クーポンなど">
+          </label>
+          <div class="actions">
+            <button class="primary-button" type="submit">保存</button>
+            <button id="cancelPurchaseEdit" class="secondary-button" type="button">クリア</button>
+          </div>
+        </form>
+
+        <div class="section-row">
+          <h3>記録一覧</h3>
+          <input id="purchaseSearch" class="search" type="search" placeholder="商品・店舗で検索">
+        </div>
+        <div id="purchaseList" class="list"></div>
+
+        <h3>店舗別購入履歴</h3>
+        <div id="storeHistoryList" class="list compact-list"></div>
+
+        <h3>商品別購入店舗履歴</h3>
+        <div id="productStoreHistoryList" class="list compact-list"></div>
+      </section>
+
+      <section id="inventory" class="view" aria-labelledby="inventoryTitle">
+        <h2 id="inventoryTitle">在庫管理</h2>
+        <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位はマスタで編集します。</p>
+        <div id="inventoryList" class="list"></div>
+      </section>
+
+      <section id="masters" class="view" aria-labelledby="mastersTitle">
+        <h2 id="mastersTitle">マスタ</h2>
+        <div class="segmented">
+          <button class="segment active" type="button" data-master="products">商品</button>
+          <button class="segment" type="button" data-master="stores">店舗</button>
+          <button class="segment" type="button" data-master="units">単位</button>
+        </div>
+
+        <div id="productsMaster" class="master-view active">
+          <form id="productForm" class="panel">
+            <input type="hidden" id="productId">
+            <label>
+              商品名
+              <input id="productName" type="text" required placeholder="牛乳 1L">
+            </label>
+            <label>
+              カテゴリ
+              <input id="productCategory" type="text" placeholder="食品・日用品など">
+            </label>
+            <div class="form-grid">
+              <label>
+                内容量
+                <input id="productAmount" type="number" min="0.01" step="0.01" required>
+              </label>
+              <label>
+                単位
+                <select id="productUnit" required></select>
+              </label>
+            </div>
+            <label>
+              商品画像
+              <input id="productImage" type="file" accept="image/*">
+            </label>
+            <div id="productImagePreview" class="image-preview empty-preview">画像なし</div>
+            <label class="check-row">
+              <input id="productImageRemove" type="checkbox">
+              登録済み画像を削除
+            </label>
+            <label class="check-row">
+              <input id="productFavorite" type="checkbox">
+              よく買う商品
+            </label>
+            <div class="actions">
+              <button class="primary-button" type="submit">保存</button>
+              <button id="cancelProductEdit" class="secondary-button" type="button">クリア</button>
+            </div>
+          </form>
+          <div id="productList" class="list"></div>
+        </div>
+
+        <div id="storesMaster" class="master-view">
+          <form id="storeForm" class="panel">
+            <input type="hidden" id="storeId">
+            <label>
+              店舗名
+              <input id="storeName" type="text" required placeholder="Aスーパー">
+            </label>
+            <label>
+              種別
+              <input id="storeType" type="text" placeholder="スーパー・ドラッグストアなど">
+            </label>
+            <label class="check-row">
+              <input id="storeFavorite" type="checkbox">
+              よく使う店舗
+            </label>
+            <div class="actions">
+              <button class="primary-button" type="submit">保存</button>
+              <button id="cancelStoreEdit" class="secondary-button" type="button">クリア</button>
+            </div>
+          </form>
+          <div id="storeList" class="list"></div>
+        </div>
+
+        <div id="unitsMaster" class="master-view">
+          <form id="unitForm" class="panel">
+            <input type="hidden" id="unitId">
+            <label>
+              単位名
+              <input id="unitName" type="text" required placeholder="g / ml / 個">
+            </label>
+            <label>
+              単位価格の基準量
+              <input id="unitBase" type="number" min="0.01" step="0.01" value="1" required>
+            </label>
+            <div class="actions">
+              <button class="primary-button" type="submit">保存</button>
+              <button id="cancelUnitEdit" class="secondary-button" type="button">クリア</button>
+            </div>
+          </form>
+          <div id="unitList" class="list"></div>
+        </div>
+      </section>
+
+      <section id="analysis" class="view" aria-labelledby="analysisTitle">
+        <h2 id="analysisTitle">最安値分析</h2>
+        <p class="note">商品マスタの内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
+        <div id="analysisList" class="list"></div>
+      </section>
+
+      <section id="share" class="view" aria-labelledby="shareTitle">
+        <h2 id="shareTitle">共有テキスト</h2>
+        <div class="panel">
+          <label>
+            共有内容
+            <select id="shareMode">
+              <option value="shopping">買い物リスト</option>
+              <option value="lowStock">在庫不足のみ</option>
+              <option value="bestStores">最安値店舗まとめ</option>
+            </select>
+          </label>
+          <textarea id="shareText" readonly rows="14"></textarea>
+          <div class="actions">
+            <button id="copyShareText" class="primary-button" type="button">コピー</button>
+            <button id="nativeShare" class="secondary-button" type="button">共有</button>
+          </div>
+          <p id="shareStatus" class="status" role="status"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

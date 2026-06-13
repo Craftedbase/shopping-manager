@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">買い物管理</title>
+  <desc id="desc">買い物かごとチェックマークのアプリアイコン</desc>
+  <rect width="512" height="512" rx="112" fill="#226b4e"/>
+  <path d="M150 214h212l-24 176H174l-24-176Z" fill="#fff"/>
+  <path d="M178 214c0-61 34-102 78-102s78 41 78 102" fill="none" stroke="#f6d36f" stroke-width="30" stroke-linecap="round"/>
+  <path d="m217 304 36 36 82-92" fill="none" stroke="#226b4e" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="174" cy="390" r="19" fill="#f6d36f"/>
+  <circle cx="338" cy="390" r="19" fill="#f6d36f"/>
+</svg>
