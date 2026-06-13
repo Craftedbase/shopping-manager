@@ -34,16 +34,26 @@
     if (!raw) return structuredClone(defaultState);
 
     try {
-      const parsed = JSON.parse(raw);
-      return {
-        ...structuredClone(defaultState),
-        ...parsed,
-        units: parsed.units?.length ? parsed.units : structuredClone(defaultState.units),
-        shoppingItems: parsed.shoppingItems || []
-      };
+      return normalizeState(JSON.parse(raw));
     } catch {
       return structuredClone(defaultState);
     }
+  }
+
+  function normalizeState(data) {
+    if (!data || typeof data !== "object") {
+      throw new Error("invalid state");
+    }
+
+    return {
+      ...structuredClone(defaultState),
+      ...data,
+      units: Array.isArray(data.units) && data.units.length ? data.units : structuredClone(defaultState.units),
+      products: Array.isArray(data.products) ? data.products : [],
+      stores: Array.isArray(data.stores) ? data.stores : [],
+      purchases: Array.isArray(data.purchases) ? data.purchases : [],
+      shoppingItems: Array.isArray(data.shoppingItems) ? data.shoppingItems : []
+    };
   }
 
   function saveState() {
@@ -108,12 +118,16 @@
       .map((unit) => `<option value="${unit.id}">${escapeHtml(unit.name)} / ${unit.base}${escapeHtml(unit.name)}基準</option>`)
       .join("");
 
-    byId("purchaseProduct").innerHTML = productOptions || "<option value=\"\">先に商品を登録</option>";
+    byId("purchaseProduct").innerHTML = productOptions
+      ? `<option value="">商品を選択</option>${productOptions}`
+      : "<option value=\"\">先に商品を登録</option>";
     byId("purchaseStore").innerHTML = storeOptions || "<option value=\"\">先に店舗を登録</option>";
     byId("shoppingProduct").innerHTML = `<option value="">メモ商品として追加</option>${productOptions}`;
     byId("shoppingStore").innerHTML = `<option value="">最安値店舗に任せる</option>${storeOptions}`;
     byId("productUnit").innerHTML = unitOptions;
-    byId("purchaseProduct").value = selectedPurchaseProduct || sortedProducts[0]?.id || "";
+    byId("purchaseProduct").value = selectedPurchaseProduct && sortedProducts.some((product) => product.id === selectedPurchaseProduct)
+      ? selectedPurchaseProduct
+      : "";
     byId("purchaseStore").value = selectedPurchaseStore || getRecentStoreId() || sortedStores[0]?.id || "";
     byId("shoppingProduct").value = selectedShoppingProduct;
     byId("shoppingStore").value = selectedShoppingStore;
@@ -450,15 +464,23 @@
     renderShareText();
   }
 
-  function resetPurchaseForm() {
+  function resetPurchaseForm(options = {}) {
+    const keepDateStore = Boolean(options.keepDateStore);
+    const selectedDate = byId("purchaseDate").value;
+    const selectedStore = byId("purchaseStore").value;
     byId("purchaseId").value = "";
-    byId("purchaseDate").value = today();
+    byId("purchaseDate").value = keepDateStore && selectedDate ? selectedDate : today();
+    byId("purchaseProduct").value = "";
     byId("purchaseQuantity").value = "1";
     byId("purchasePrice").value = "";
     byId("purchaseNote").value = "";
-    const recentStoreId = getRecentStoreId();
+    byId("purchaseStatus").textContent = "";
+    const recentStoreId = keepDateStore ? selectedStore : getRecentStoreId();
     if (recentStoreId) byId("purchaseStore").value = recentStoreId;
     renderPurchaseHint();
+    if (options.focusProduct) {
+      setTimeout(() => byId("purchaseProduct").focus(), 0);
+    }
   }
 
   function resetProductForm() {
@@ -545,6 +567,8 @@
     byId("copyShareText").addEventListener("click", copyShareText);
     byId("nativeShare").addEventListener("click", nativeShare);
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
+    byId("exportBackup").addEventListener("click", exportBackup);
+    byId("importBackup").addEventListener("change", importBackup);
     byId("openActionButton").addEventListener("click", openActionPanel);
     document.querySelectorAll("[data-close-shopping-panel]").forEach((button) => {
       button.addEventListener("click", closeShoppingPanel);
@@ -603,9 +627,14 @@
       alert("先に商品と店舗を登録してください。");
       return;
     }
+    if (!byId("purchaseProduct").value || !byId("purchaseStore").value) {
+      alert("商品と店舗を選択してください。");
+      return;
+    }
 
     const id = byId("purchaseId").value || uid("purchase");
     const existing = state.purchases.find((purchase) => purchase.id === id);
+    const isContinuous = !existing && byId("purchaseContinuous").checked;
     const purchase = {
       id,
       date: byId("purchaseDate").value,
@@ -623,7 +652,13 @@
     }
 
     saveState();
-    resetPurchaseForm();
+    resetPurchaseForm({
+      keepDateStore: isContinuous,
+      focusProduct: isContinuous
+    });
+    byId("purchaseStatus").textContent = isContinuous
+      ? "保存しました。次の商品を続けて入力できます。"
+      : "保存しました。";
     renderAll();
   }
 
@@ -1077,6 +1112,61 @@
       return;
     }
     await navigator.share({ title: "買い物リスト", text });
+  }
+
+  function exportBackup() {
+    const exportedAt = new Date();
+    const backup = {
+      app: "ストマネ（在庫管理）",
+      storageKey: STORAGE_KEY,
+      version: 1,
+      exportedAt: exportedAt.toISOString(),
+      data: state
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const timestamp = exportedAt.toISOString().slice(0, 19).replaceAll(":", "").replace("T", "-");
+
+    link.href = url;
+    link.download = `stumane-backup-${timestamp}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    byId("backupStatus").textContent = "バックアップファイルを作成しました。";
+  }
+
+  async function importBackup(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const restoredState = normalizeState(parsed.data || parsed);
+      const shouldRestore = confirm("現在のデータをバックアップ内容で上書きします。よろしいですか？");
+
+      if (!shouldRestore) return;
+
+      state = restoredState;
+      pendingProductImage = "";
+      pendingStoreImage = "";
+      saveState();
+      resetPurchaseForm();
+      resetProductForm();
+      resetStoreForm();
+      resetUnitForm();
+      resetShoppingForm();
+      closeShoppingPanel();
+      closeMasterForm();
+      renderAll();
+      byId("backupStatus").textContent = "バックアップから復元しました。";
+    } catch {
+      alert("バックアップファイルを読み込めませんでした。");
+      byId("backupStatus").textContent = "復元に失敗しました。";
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function escapeHtml(value) {

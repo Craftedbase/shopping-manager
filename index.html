@@ -29,6 +29,7 @@
         <button class="menu-item" type="button" data-menu-master="products">商品登録</button>
         <button class="menu-item" type="button" data-menu-master="units">単位登録</button>
         <button class="menu-item" type="button" data-menu-master="stores">店舗登録</button>
+        <button class="menu-item" type="button" data-view-target="backup">バックアップ</button>
       </div>
     </div>
 
@@ -126,6 +127,11 @@
             メモ
             <input id="purchaseNote" type="text" placeholder="特売、クーポンなど">
           </label>
+          <label class="check-row">
+            <input id="purchaseContinuous" type="checkbox" checked>
+            <span>連続入力する（日付と店舗を残す）</span>
+          </label>
+          <p id="purchaseStatus" class="status" role="status"></p>
           <div class="actions">
             <button class="primary-button" type="submit">保存</button>
             <button id="cancelPurchaseEdit" class="secondary-button" type="button">クリア</button>
@@ -259,6 +265,21 @@
         </div>
         <p class="note">商品の内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
         <div id="analysisList" class="list"></div>
+      </section>
+
+      <section id="backup" class="view" aria-labelledby="backupTitle">
+        <div class="section-row">
+          <h2 id="backupTitle">バックアップ</h2>
+        </div>
+        <div class="panel">
+          <p class="note">スマホ内に保存されている商品、店舗、単位、購入ログ、買い物リストをJSONファイルとして保存・復元できます。</p>
+          <button id="exportBackup" class="primary-button" type="button">バックアップ作成</button>
+          <label>
+            バックアップから復元
+            <input id="importBackup" type="file" accept="application/json,.json">
+          </label>
+          <p id="backupStatus" class="status" role="status"></p>
+        </div>
       </section>
 
       <section id="share" class="view" aria-labelledby="shareTitle">
