@@ -113,40 +113,6 @@
     byId("shoppingStore").value = selectedShoppingStore;
   }
 
-  function renderDashboard() {
-    const monthKey = today().slice(0, 7);
-    const monthTotal = state.purchases
-      .filter((purchase) => purchase.date.startsWith(monthKey))
-      .reduce((sum, purchase) => sum + Number(purchase.price || 0), 0);
-    const lowStock = getLowStockProducts();
-
-    byId("monthTotal").textContent = money(monthTotal);
-    byId("lowStockCount").textContent = lowStock.length;
-    byId("productCount").textContent = state.products.length;
-    byId("purchaseCount").textContent = state.purchases.length;
-
-    byId("lowStockList").innerHTML = lowStock.length
-      ? lowStock.map((product) => `
-          <article class="item">
-            <div class="item-header">
-              <div>
-                <p class="item-title">${escapeHtml(product.name)}</p>
-                <p class="meta">在庫 ${product.stock} / 最低 ${product.minStock}</p>
-              </div>
-              <span class="badge danger">不足</span>
-            </div>
-          </article>
-        `).join("")
-      : "<div class=\"empty\">在庫不足の商品はありません。</div>";
-
-    const recent = [...state.purchases]
-      .sort((a, b) => b.date.localeCompare(a.date))
-      .slice(0, 5);
-    byId("recentPurchases").innerHTML = recent.length
-      ? recent.map(renderPurchaseItem).join("")
-      : "<div class=\"empty\">購入ログはまだありません。</div>";
-  }
-
   function renderPurchases() {
     const keyword = byId("purchaseSearch").value.trim().toLowerCase();
     const purchases = [...state.purchases]
@@ -266,7 +232,7 @@
             </article>
           `;
         }).join("")
-      : "<div class=\"empty\">先に商品マスタを登録してください。</div>";
+      : "<div class=\"empty\">先に商品を登録してください。</div>";
   }
 
   function renderStores() {
@@ -462,7 +428,6 @@
 
   function renderAll() {
     renderOptions();
-    renderDashboard();
     renderShoppingList();
     renderPurchases();
     renderInventory();
@@ -523,16 +488,13 @@
       tab.addEventListener("click", () => switchView(tab.dataset.view));
     });
 
-    document.querySelectorAll("[data-jump]").forEach((button) => {
-      button.addEventListener("click", () => switchView(button.dataset.jump));
-    });
-
     document.querySelectorAll(".segment").forEach((segment) => {
       segment.addEventListener("click", () => {
         document.querySelectorAll(".segment").forEach((item) => item.classList.remove("active"));
         document.querySelectorAll(".master-view").forEach((item) => item.classList.remove("active"));
         segment.classList.add("active");
         byId(`${segment.dataset.master}Master`).classList.add("active");
+        updateSettingsTitle(segment.dataset.master);
       });
     });
 
@@ -552,7 +514,6 @@
     byId("copyShareText").addEventListener("click", copyShareText);
     byId("nativeShare").addEventListener("click", nativeShare);
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
-    byId("seedButton").addEventListener("click", seedSampleData);
 
     document.addEventListener("click", handleListActions);
     document.addEventListener("change", handleInventoryInputs);
@@ -561,6 +522,15 @@
   function switchView(viewId) {
     document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
     document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
+  }
+
+  function updateSettingsTitle(masterType) {
+    const titles = {
+      products: "商品登録",
+      stores: "店舗登録",
+      units: "単位登録"
+    };
+    byId("mastersTitle").textContent = titles[masterType] || "設定";
   }
 
   function savePurchase(event) {
@@ -937,25 +907,6 @@
       return;
     }
     await navigator.share({ title: "買い物リスト", text });
-  }
-
-  function seedSampleData() {
-    if (state.products.length || state.stores.length || state.purchases.length) {
-      if (!confirm("サンプルデータを追加しますか？")) return;
-    }
-
-    const milk = { id: uid("product"), name: "牛乳 1L", category: "食品", amount: 1000, unitId: "u-ml", stock: 0, minStock: 1, favorite: true };
-    const eggs = { id: uid("product"), name: "卵 10個", category: "食品", amount: 10, unitId: "u-count", stock: 1, minStock: 1, favorite: true };
-    const supermarket = { id: uid("store"), name: "Aスーパー", type: "スーパー", favorite: true };
-    const drugstore = { id: uid("store"), name: "Bドラッグ", type: "ドラッグストア", favorite: true };
-    state.products.push(milk, eggs);
-    state.stores.push(supermarket, drugstore);
-    state.purchases.push(
-      { id: uid("purchase"), date: today(), productId: milk.id, storeId: supermarket.id, quantity: 1, price: 218, note: "" },
-      { id: uid("purchase"), date: today(), productId: eggs.id, storeId: drugstore.id, quantity: 1, price: 238, note: "" }
-    );
-    saveState();
-    renderAll();
   }
 
   function escapeHtml(value) {

@@ -16,55 +16,21 @@
   <body>
     <header class="app-header">
       <div>
-        <p class="eyebrow">税込価格・スマホ内保存</p>
         <h1>買い物管理</h1>
       </div>
-      <button id="seedButton" class="icon-button" type="button" title="サンプル追加" aria-label="サンプル追加">＋</button>
     </header>
 
     <main>
       <nav class="tabs" aria-label="主要画面">
-        <button class="tab active" type="button" data-view="dashboard">概要</button>
-        <button class="tab" type="button" data-view="shopping">買物</button>
+        <button class="tab active" type="button" data-view="shopping">買物</button>
         <button class="tab" type="button" data-view="log">記録</button>
         <button class="tab" type="button" data-view="inventory">在庫</button>
-        <button class="tab" type="button" data-view="masters">マスタ</button>
+        <button class="tab" type="button" data-view="masters">設定</button>
         <button class="tab" type="button" data-view="analysis">分析</button>
         <button class="tab" type="button" data-view="share">共有</button>
       </nav>
 
-      <section id="dashboard" class="view active" aria-labelledby="dashboardTitle">
-        <h2 id="dashboardTitle">概要</h2>
-        <div class="summary-grid">
-          <article class="summary-tile">
-            <span>今月の購入</span>
-            <strong id="monthTotal">0円</strong>
-          </article>
-          <article class="summary-tile">
-            <span>在庫不足</span>
-            <strong id="lowStockCount">0</strong>
-          </article>
-          <article class="summary-tile">
-            <span>登録商品</span>
-            <strong id="productCount">0</strong>
-          </article>
-          <article class="summary-tile">
-            <span>購入ログ</span>
-            <strong id="purchaseCount">0</strong>
-          </article>
-        </div>
-
-        <div class="section-row">
-          <h3>在庫不足</h3>
-          <button class="text-button" type="button" data-jump="share">共有文へ</button>
-        </div>
-        <div id="lowStockList" class="list compact-list"></div>
-
-        <h3>最近の購入</h3>
-        <div id="recentPurchases" class="list compact-list"></div>
-      </section>
-
-      <section id="shopping" class="view" aria-labelledby="shoppingTitle">
+      <section id="shopping" class="view active" aria-labelledby="shoppingTitle">
         <h2 id="shoppingTitle">買うものチェックリスト</h2>
         <form id="shoppingForm" class="panel">
           <label>
@@ -73,7 +39,7 @@
           </label>
           <label>
             メモ商品
-            <input id="shoppingName" type="text" placeholder="マスタ未登録の商品">
+            <input id="shoppingName" type="text" placeholder="未登録の商品">
           </label>
           <label>
             購入予定店舗
@@ -139,12 +105,12 @@
 
       <section id="inventory" class="view" aria-labelledby="inventoryTitle">
         <h2 id="inventoryTitle">在庫管理</h2>
-        <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位はマスタで編集します。</p>
+        <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位は設定で編集します。</p>
         <div id="inventoryList" class="list"></div>
       </section>
 
       <section id="masters" class="view" aria-labelledby="mastersTitle">
-        <h2 id="mastersTitle">マスタ</h2>
+        <h2 id="mastersTitle">商品登録</h2>
         <div class="segmented">
           <button class="segment active" type="button" data-master="products">商品</button>
           <button class="segment" type="button" data-master="stores">店舗</button>
@@ -238,7 +204,7 @@
 
       <section id="analysis" class="view" aria-labelledby="analysisTitle">
         <h2 id="analysisTitle">最安値分析</h2>
-        <p class="note">商品マスタの内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
+        <p class="note">商品の内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
         <div id="analysisList" class="list"></div>
       </section>
 
