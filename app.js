@@ -892,6 +892,7 @@
     const isMasterFormOpen = byId("masters").classList.contains("form-open");
     byId("openActionButton").classList.toggle("hidden", !canAdd || isPanelOpen || isMasterFormOpen);
     byId("openActionButton").setAttribute("aria-label", activeView === "masters" ? "登録項目を追加" : "買い物リストに追加");
+    byId("homeButton").classList.toggle("hidden", activeView === "home" || isPanelOpen || isMasterFormOpen);
   }
 
   function renderPurchaseHint() {

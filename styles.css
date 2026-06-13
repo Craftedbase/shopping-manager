@@ -113,8 +113,8 @@ button {
 .menu-card {
   position: absolute;
   top: 86px;
-  right: 12px;
-  width: min(260px, calc(100vw - 24px));
+  right: 8px;
+  width: min(220px, calc(100vw - 16px));
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -427,6 +427,15 @@ textarea {
   font-size: 30px;
   font-weight: 800;
   box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
+}
+
+.home-fab {
+  left: 18px;
+  right: auto;
+  background: var(--surface);
+  color: var(--accent-strong);
+  border: 1px solid var(--line);
+  font-size: 28px;
 }
 
 .fab.hidden {

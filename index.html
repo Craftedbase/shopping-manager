@@ -55,7 +55,6 @@
         <div class="section-row">
           <h2 id="shoppingTitle">買い物リスト</h2>
           <div class="section-actions">
-            <button class="text-button" type="button" data-view-target="home">ホームへ</button>
             <button id="clearCheckedItems" class="text-button" type="button">購入済み整理</button>
           </div>
         </div>
@@ -93,7 +92,6 @@
       <section id="log" class="view" aria-labelledby="logTitle">
         <div class="section-row">
           <h2 id="logTitle">買物入力</h2>
-          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
         </div>
         <form id="purchaseForm" class="panel">
           <input type="hidden" id="purchaseId">
@@ -146,7 +144,6 @@
       <section id="inventory" class="view" aria-labelledby="inventoryTitle">
         <div class="section-row">
           <h2 id="inventoryTitle">在庫管理</h2>
-          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
         </div>
         <p class="note">現在在庫と最低在庫はここで管理します。商品名・容量・単位は設定で編集します。</p>
         <div id="inventoryList" class="list"></div>
@@ -155,7 +152,6 @@
       <section id="masters" class="view" aria-labelledby="mastersTitle">
         <div class="section-row">
           <h2 id="mastersTitle">商品登録</h2>
-          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
         </div>
         <div id="masterFormBackdrop" class="master-form-backdrop" data-close-master-form></div>
 
@@ -256,7 +252,6 @@
       <section id="analysis" class="view" aria-labelledby="analysisTitle">
         <div class="section-row">
           <h2 id="analysisTitle">最安値</h2>
-          <button class="text-button" type="button" data-view-target="home">ホームへ</button>
         </div>
         <p class="note">商品の内容量・単位をもとに、税込価格から単位価格を自動計算します。</p>
         <div id="analysisList" class="list"></div>
@@ -282,6 +277,7 @@
         </div>
       </section>
     </main>
+    <button id="homeButton" class="fab home-fab hidden" type="button" data-view-target="home" aria-label="ホームへ">⌂</button>
     <button id="openActionButton" class="fab" type="button" aria-label="追加">＋</button>
 
     <script src="app.js"></script>
