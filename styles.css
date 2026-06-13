@@ -500,13 +500,13 @@ textarea {
 
 #masters.form-open .master-view.active > form.panel {
   position: fixed;
+  top: max(76px, env(safe-area-inset-top));
   left: 12px;
   right: 12px;
   bottom: max(12px, env(safe-area-inset-bottom));
   z-index: 20;
   display: grid;
   width: min(720px, calc(100vw - 24px));
-  max-height: calc(100vh - 60px);
   overflow: auto;
   margin: 0 auto;
   border-radius: 18px;
