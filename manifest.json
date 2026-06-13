@@ -1,7 +1,7 @@
 {
-  "name": "Stock Manager",
-  "short_name": "Stock",
-  "description": "購入ログ、在庫、最安値店舗を管理するStock Managerアプリ",
+  "name": "ストマネ ~Stock Manager~（在庫管理）",
+  "short_name": "ストマネ",
+  "description": "購入ログ、在庫、最安値店舗を管理するストマネアプリ",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
