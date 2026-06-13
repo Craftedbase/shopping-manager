@@ -514,6 +514,10 @@
     byId("copyShareText").addEventListener("click", copyShareText);
     byId("nativeShare").addEventListener("click", nativeShare);
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
+    byId("openShoppingPanel").addEventListener("click", openShoppingPanel);
+    document.querySelectorAll("[data-close-shopping-panel]").forEach((button) => {
+      button.addEventListener("click", closeShoppingPanel);
+    });
 
     document.addEventListener("click", handleListActions);
     document.addEventListener("change", handleInventoryInputs);
@@ -522,6 +526,8 @@
   function switchView(viewId) {
     document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
     document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
+    closeShoppingPanel();
+    updateShoppingFab();
   }
 
   function updateSettingsTitle(masterType) {
@@ -583,6 +589,7 @@
     });
     saveState();
     resetShoppingForm();
+    closeShoppingPanel();
     renderAll();
   }
 
@@ -763,6 +770,25 @@
     renderAll();
   }
 
+  function openShoppingPanel() {
+    byId("shoppingAddPanel").classList.add("open");
+    byId("shoppingAddPanel").setAttribute("aria-hidden", "false");
+    byId("openShoppingPanel").classList.add("hidden");
+    byId("shoppingProduct").focus();
+  }
+
+  function closeShoppingPanel() {
+    byId("shoppingAddPanel").classList.remove("open");
+    byId("shoppingAddPanel").setAttribute("aria-hidden", "true");
+    updateShoppingFab();
+  }
+
+  function updateShoppingFab() {
+    const isShoppingView = document.querySelector(".view.active")?.id === "shopping";
+    const isPanelOpen = byId("shoppingAddPanel").classList.contains("open");
+    byId("openShoppingPanel").classList.toggle("hidden", !isShoppingView || isPanelOpen);
+  }
+
   function renderPurchaseHint() {
     const product = productById(byId("purchaseProduct").value);
     if (!product) {
@@ -923,6 +949,7 @@
   resetPurchaseForm();
   resetShoppingForm();
   renderAll();
+  updateShoppingFab();
   registerServiceWorker();
 
   function registerServiceWorker() {

@@ -56,6 +56,21 @@ button {
   backdrop-filter: blur(10px);
 }
 
+.app-version {
+  flex: 0 0 auto;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.1);
+}
+
 .eyebrow {
   margin: 0 0 2px;
   color: var(--muted);
@@ -87,7 +102,7 @@ h3 {
 main {
   width: min(720px, 100%);
   margin: 0 auto;
-  padding: 12px 12px 32px;
+  padding: 12px 12px 92px;
 }
 
 .tabs {
@@ -308,6 +323,75 @@ textarea {
   background: var(--accent);
   color: #fff;
   font-size: 22px;
+}
+
+.fab {
+  position: fixed;
+  right: 18px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 12;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
+}
+
+.fab.hidden {
+  display: none;
+}
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+}
+
+.sheet.open {
+  display: block;
+}
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.sheet-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 16px 12px max(18px, env(safe-area-inset-bottom));
+  border-radius: 18px 18px 0 0;
+  background: var(--bg);
+  box-shadow: 0 -18px 36px rgba(15, 23, 42, 0.18);
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(720px, 100%);
+  margin: 0 auto 12px;
+}
+
+.sheet-header h2 {
+  margin-bottom: 0;
+}
+
+.sheet-panel {
+  width: min(720px, 100%);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .segmented {

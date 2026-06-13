@@ -18,12 +18,13 @@
       <div>
         <h1>買い物管理</h1>
       </div>
+      <span class="app-version" aria-label="アプリバージョン">Ver. 0.5.0</span>
     </header>
 
     <main>
       <nav class="tabs" aria-label="主要画面">
-        <button class="tab active" type="button" data-view="shopping">買物</button>
-        <button class="tab" type="button" data-view="log">記録</button>
+        <button class="tab active" type="button" data-view="shopping">ホーム</button>
+        <button class="tab" type="button" data-view="log">入力</button>
         <button class="tab" type="button" data-view="inventory">在庫</button>
         <button class="tab" type="button" data-view="masters">設定</button>
         <button class="tab" type="button" data-view="analysis">分析</button>
@@ -31,8 +32,21 @@
       </nav>
 
       <section id="shopping" class="view active" aria-labelledby="shoppingTitle">
-        <h2 id="shoppingTitle">買うものチェックリスト</h2>
-        <form id="shoppingForm" class="panel">
+        <div class="section-row">
+          <h2 id="shoppingTitle">買い物リスト</h2>
+          <button id="clearCheckedItems" class="text-button" type="button">購入済み整理</button>
+        </div>
+        <div id="shoppingList" class="list"></div>
+      </section>
+
+      <section id="shoppingAddPanel" class="sheet" aria-labelledby="shoppingAddTitle" aria-hidden="true">
+        <div class="sheet-backdrop" data-close-shopping-panel></div>
+        <div class="sheet-body" role="dialog" aria-modal="true">
+          <div class="sheet-header">
+            <h2 id="shoppingAddTitle">買い物リストに追加</h2>
+            <button class="mini-button" type="button" data-close-shopping-panel aria-label="閉じる">×</button>
+          </div>
+          <form id="shoppingForm" class="panel sheet-panel">
           <label>
             商品
             <select id="shoppingProduct"></select>
@@ -47,14 +61,14 @@
           </label>
           <div class="actions">
             <button class="primary-button" type="submit">追加</button>
-            <button id="clearCheckedItems" class="secondary-button" type="button">購入済み整理</button>
+            <button class="secondary-button" type="button" data-close-shopping-panel>キャンセル</button>
           </div>
         </form>
-        <div id="shoppingList" class="list"></div>
+        </div>
       </section>
 
       <section id="log" class="view" aria-labelledby="logTitle">
-        <h2 id="logTitle">購入ログ</h2>
+        <h2 id="logTitle">買物入力</h2>
         <form id="purchaseForm" class="panel">
           <input type="hidden" id="purchaseId">
           <label>
@@ -228,6 +242,7 @@
         </div>
       </section>
     </main>
+    <button id="openShoppingPanel" class="fab" type="button" aria-label="買い物リストに追加">＋</button>
 
     <script src="app.js"></script>
   </body>
