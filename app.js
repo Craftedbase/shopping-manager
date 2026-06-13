@@ -16,6 +16,7 @@
 
   let state = loadState();
   let pendingProductImage = "";
+  let pendingStoreImage = "";
 
   const yen = new Intl.NumberFormat("ja-JP", {
     style: "currency",
@@ -83,6 +84,11 @@
   function productImageMarkup(product) {
     if (!product?.image) return "";
     return `<img class="product-thumb" src="${product.image}" alt="">`;
+  }
+
+  function storeImageMarkup(store) {
+    if (!store?.image) return "";
+    return `<img class="product-thumb" src="${store.image}" alt="">`;
   }
 
   function renderOptions() {
@@ -240,9 +246,12 @@
       ? state.stores.map((store) => `
           <article class="item">
             <div class="item-header">
-              <div>
-                <p class="item-title">${escapeHtml(store.name)}</p>
-                <p class="meta">${escapeHtml(store.type || "種別なし")}</p>
+              <div class="item-main">
+                ${storeImageMarkup(store)}
+                <div>
+                  <p class="item-title">${escapeHtml(store.name)}</p>
+                  <p class="meta">${escapeHtml(store.type || "種別なし")}</p>
+                </div>
               </div>
               <div class="item-actions">
                 ${store.favorite ? "<span class=\"badge\">常用</span>" : ""}
@@ -465,9 +474,13 @@
   }
 
   function resetStoreForm() {
+    pendingStoreImage = "";
     byId("storeId").value = "";
     byId("storeName").value = "";
     byId("storeType").value = "";
+    byId("storeImage").value = "";
+    byId("storeImageRemove").checked = false;
+    renderStoreImagePreview("");
     byId("storeFavorite").checked = false;
   }
 
@@ -488,6 +501,14 @@
       tab.addEventListener("click", () => switchView(tab.dataset.view));
     });
 
+    byId("menuButton").addEventListener("click", openMenu);
+    document.querySelectorAll("[data-close-menu]").forEach((button) => {
+      button.addEventListener("click", closeMenu);
+    });
+    document.querySelectorAll("[data-menu-master]").forEach((button) => {
+      button.addEventListener("click", () => openMasterView(button.dataset.menuMaster));
+    });
+
     document.querySelectorAll(".segment").forEach((segment) => {
       segment.addEventListener("click", () => {
         document.querySelectorAll(".segment").forEach((item) => item.classList.remove("active"));
@@ -504,19 +525,32 @@
     byId("storeForm").addEventListener("submit", saveStore);
     byId("unitForm").addEventListener("submit", saveUnit);
     byId("cancelPurchaseEdit").addEventListener("click", resetPurchaseForm);
-    byId("cancelProductEdit").addEventListener("click", resetProductForm);
-    byId("cancelStoreEdit").addEventListener("click", resetStoreForm);
-    byId("cancelUnitEdit").addEventListener("click", resetUnitForm);
+    byId("cancelProductEdit").addEventListener("click", () => {
+      resetProductForm();
+      closeMasterForm();
+    });
+    byId("cancelStoreEdit").addEventListener("click", () => {
+      resetStoreForm();
+      closeMasterForm();
+    });
+    byId("cancelUnitEdit").addEventListener("click", () => {
+      resetUnitForm();
+      closeMasterForm();
+    });
     byId("purchaseSearch").addEventListener("input", renderPurchases);
     byId("purchaseProduct").addEventListener("change", renderPurchaseHint);
     byId("shareMode").addEventListener("change", renderShareText);
     byId("productImage").addEventListener("change", handleProductImageSelection);
+    byId("storeImage").addEventListener("change", handleStoreImageSelection);
     byId("copyShareText").addEventListener("click", copyShareText);
     byId("nativeShare").addEventListener("click", nativeShare);
     byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
-    byId("openShoppingPanel").addEventListener("click", openShoppingPanel);
+    byId("openActionButton").addEventListener("click", openActionPanel);
     document.querySelectorAll("[data-close-shopping-panel]").forEach((button) => {
       button.addEventListener("click", closeShoppingPanel);
+    });
+    document.querySelectorAll("[data-close-master-form]").forEach((button) => {
+      button.addEventListener("click", closeMasterForm);
     });
 
     document.addEventListener("click", handleListActions);
@@ -527,7 +561,9 @@
     document.querySelectorAll(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.view === viewId));
     document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === viewId));
     closeShoppingPanel();
-    updateShoppingFab();
+    closeMasterForm();
+    closeMenu();
+    updateActionButton();
   }
 
   function updateSettingsTitle(masterType) {
@@ -537,6 +573,29 @@
       units: "単位登録"
     };
     byId("mastersTitle").textContent = titles[masterType] || "設定";
+  }
+
+  function openMenu() {
+    byId("menuPanel").classList.add("open");
+    byId("menuPanel").setAttribute("aria-hidden", "false");
+  }
+
+  function closeMenu() {
+    byId("menuPanel").classList.remove("open");
+    byId("menuPanel").setAttribute("aria-hidden", "true");
+  }
+
+  function openMasterView(masterType) {
+    closeMenu();
+    switchView("masters");
+    setActiveMaster(masterType);
+  }
+
+  function setActiveMaster(masterType) {
+    document.querySelectorAll(".master-view").forEach((item) => item.classList.remove("active"));
+    byId(`${masterType}Master`).classList.add("active");
+    updateSettingsTitle(masterType);
+    updateActionButton();
   }
 
   function savePurchase(event) {
@@ -613,21 +672,27 @@
     upsert(state.products, product);
     saveState();
     resetProductForm();
+    closeMasterForm();
     renderAll();
   }
 
   function saveStore(event) {
     event.preventDefault();
+    const id = byId("storeId").value || uid("store");
+    const existing = storeById(id);
+    const shouldRemoveImage = byId("storeImageRemove").checked;
     const store = {
-      id: byId("storeId").value || uid("store"),
+      id,
       name: byId("storeName").value.trim(),
       type: byId("storeType").value.trim(),
+      image: shouldRemoveImage ? "" : pendingStoreImage || existing?.image || "",
       favorite: byId("storeFavorite").checked
     };
 
     upsert(state.stores, store);
     saveState();
     resetStoreForm();
+    closeMasterForm();
     renderAll();
   }
 
@@ -642,6 +707,7 @@
     upsert(state.units, unit);
     saveState();
     resetUnitForm();
+    closeMasterForm();
     renderAll();
   }
 
@@ -770,23 +836,63 @@
     renderAll();
   }
 
+  function openActionPanel() {
+    const activeView = document.querySelector(".view.active")?.id;
+    if (activeView === "shopping") {
+      openShoppingPanel();
+      return;
+    }
+    if (activeView === "masters") {
+      openMasterForm();
+    }
+  }
+
   function openShoppingPanel() {
     byId("shoppingAddPanel").classList.add("open");
     byId("shoppingAddPanel").setAttribute("aria-hidden", "false");
-    byId("openShoppingPanel").classList.add("hidden");
+    byId("openActionButton").classList.add("hidden");
     byId("shoppingProduct").focus();
   }
 
   function closeShoppingPanel() {
     byId("shoppingAddPanel").classList.remove("open");
     byId("shoppingAddPanel").setAttribute("aria-hidden", "true");
-    updateShoppingFab();
+    updateActionButton();
   }
 
-  function updateShoppingFab() {
-    const isShoppingView = document.querySelector(".view.active")?.id === "shopping";
+  function openMasterForm() {
+    const activeMaster = document.querySelector(".master-view.active")?.id;
+    if (activeMaster === "productsMaster" && !byId("productId").value) resetProductForm();
+    if (activeMaster === "storesMaster" && !byId("storeId").value) resetStoreForm();
+    if (activeMaster === "unitsMaster" && !byId("unitId").value) resetUnitForm();
+    byId("masters").classList.add("form-open");
+    byId("openActionButton").classList.add("hidden");
+    const focusTarget = {
+      productsMaster: "productName",
+      storesMaster: "storeName",
+      unitsMaster: "unitName"
+    }[activeMaster];
+    if (focusTarget) byId(focusTarget).focus();
+  }
+
+  function closeMasterForm() {
+    if (byId("masters").classList.contains("form-open")) {
+      const activeMaster = document.querySelector(".master-view.active")?.id;
+      if (activeMaster === "productsMaster") resetProductForm();
+      if (activeMaster === "storesMaster") resetStoreForm();
+      if (activeMaster === "unitsMaster") resetUnitForm();
+    }
+    byId("masters").classList.remove("form-open");
+    updateActionButton();
+  }
+
+  function updateActionButton() {
+    const activeView = document.querySelector(".view.active")?.id;
+    const canAdd = activeView === "shopping" || activeView === "masters";
     const isPanelOpen = byId("shoppingAddPanel").classList.contains("open");
-    byId("openShoppingPanel").classList.toggle("hidden", !isShoppingView || isPanelOpen);
+    const isMasterFormOpen = byId("masters").classList.contains("form-open");
+    byId("openActionButton").classList.toggle("hidden", !canAdd || isPanelOpen || isMasterFormOpen);
+    byId("openActionButton").setAttribute("aria-label", activeView === "masters" ? "登録項目を追加" : "買い物リストに追加");
   }
 
   function renderPurchaseHint() {
@@ -826,6 +932,7 @@
   function fillProductForm(id) {
     const product = productById(id);
     if (!product) return;
+    openMasterView("products");
     pendingProductImage = "";
     byId("productId").value = product.id;
     byId("productName").value = product.name;
@@ -836,6 +943,7 @@
     byId("productImageRemove").checked = false;
     renderProductImagePreview(product.image || "");
     byId("productFavorite").checked = Boolean(product.favorite);
+    openMasterForm();
   }
 
   async function handleProductImageSelection(event) {
@@ -862,6 +970,34 @@
 
   function renderProductImagePreview(src) {
     byId("productImagePreview").innerHTML = src
+      ? `<img src="${src}" alt="">`
+      : "画像なし";
+  }
+
+  async function handleStoreImageSelection(event) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      pendingStoreImage = "";
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      alert("画像ファイルを選択してください。");
+      byId("storeImage").value = "";
+      return;
+    }
+
+    try {
+      pendingStoreImage = await resizeImageFile(file);
+      byId("storeImageRemove").checked = false;
+      renderStoreImagePreview(pendingStoreImage);
+    } catch {
+      alert("画像を読み込めませんでした。別の画像を選択してください。");
+      byId("storeImage").value = "";
+    }
+  }
+
+  function renderStoreImagePreview(src) {
+    byId("storeImagePreview").innerHTML = src
       ? `<img src="${src}" alt="">`
       : "画像なし";
   }
@@ -898,18 +1034,26 @@
   function fillStoreForm(id) {
     const store = storeById(id);
     if (!store) return;
+    openMasterView("stores");
+    pendingStoreImage = "";
     byId("storeId").value = store.id;
     byId("storeName").value = store.name;
     byId("storeType").value = store.type || "";
+    byId("storeImage").value = "";
+    byId("storeImageRemove").checked = false;
+    renderStoreImagePreview(store.image || "");
     byId("storeFavorite").checked = Boolean(store.favorite);
+    openMasterForm();
   }
 
   function fillUnitForm(id) {
     const unit = unitById(id);
     if (!unit) return;
+    openMasterView("units");
     byId("unitId").value = unit.id;
     byId("unitName").value = unit.name;
     byId("unitBase").value = unit.base;
+    openMasterForm();
   }
 
   function removeItem(key, id) {
@@ -949,7 +1093,7 @@
   resetPurchaseForm();
   resetShoppingForm();
   renderAll();
-  updateShoppingFab();
+  updateActionButton();
   registerServiceWorker();
 
   function registerServiceWorker() {

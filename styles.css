@@ -56,9 +56,15 @@ button {
   backdrop-filter: blur(10px);
 }
 
+.brand-block {
+  display: grid;
+  gap: 3px;
+}
+
 .app-version {
   flex: 0 0 auto;
   min-height: 30px;
+  width: fit-content;
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
@@ -69,6 +75,76 @@ button {
   font-size: 13px;
   font-weight: 800;
   box-shadow: 0 2px 10px rgba(37, 99, 235, 0.1);
+}
+
+.menu-button {
+  flex: 0 0 auto;
+  width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--accent-strong);
+  font-size: 24px;
+  font-weight: 900;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.1);
+}
+
+.menu-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+}
+
+.menu-panel.open {
+  display: block;
+}
+
+.menu-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 100%;
+  border: 0;
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.menu-card {
+  position: absolute;
+  top: 86px;
+  right: 12px;
+  width: min(260px, calc(100vw - 24px));
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.18);
+}
+
+.menu-title {
+  margin: 4px 6px 10px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.menu-item {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  padding: 0 10px;
+  font-weight: 800;
+}
+
+.menu-item:active,
+.menu-item:hover {
+  background: var(--surface-strong);
+  color: var(--accent-strong);
 }
 
 .eyebrow {
@@ -107,7 +183,7 @@ main {
 
 .tabs {
   position: sticky;
-  top: 74px;
+  top: 92px;
   z-index: 4;
   display: flex;
   overflow-x: auto;
@@ -127,7 +203,7 @@ main {
 .tab,
 .segment {
   flex: 0 0 auto;
-  min-width: 64px;
+  min-width: 96px;
   min-height: 42px;
   border: 0;
   border-radius: 6px;
@@ -394,6 +470,36 @@ textarea {
   margin-right: auto;
 }
 
+.master-form-backdrop {
+  display: none;
+}
+
+#masters .master-view > form.panel {
+  display: none;
+}
+
+#masters.form-open .master-form-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  display: block;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+#masters.form-open .master-view.active > form.panel {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 20;
+  display: grid;
+  width: min(720px, calc(100vw - 24px));
+  max-height: calc(100vh - 60px);
+  overflow: auto;
+  margin: 0 auto;
+  border-radius: 18px;
+}
+
 .segmented {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -539,7 +645,7 @@ textarea {
 
 @media (max-width: 420px) {
   .tabs {
-    top: 72px;
+    top: 92px;
   }
 
   .tab {

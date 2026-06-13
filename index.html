@@ -15,20 +15,29 @@
   </head>
   <body>
     <header class="app-header">
-      <div>
+      <div class="brand-block">
         <h1>買い物管理</h1>
+        <span class="app-version" aria-label="アプリバージョン">Ver. 0.6.0</span>
       </div>
-      <span class="app-version" aria-label="アプリバージョン">Ver. 0.5.0</span>
+      <button id="menuButton" class="menu-button" type="button" aria-label="設定メニューを開く">☰</button>
     </header>
+
+    <div id="menuPanel" class="menu-panel" aria-hidden="true">
+      <button class="menu-backdrop" type="button" data-close-menu aria-label="設定メニューを閉じる"></button>
+      <div class="menu-card">
+        <p class="menu-title">設定</p>
+        <button class="menu-item" type="button" data-menu-master="products">商品登録</button>
+        <button class="menu-item" type="button" data-menu-master="units">単位登録</button>
+        <button class="menu-item" type="button" data-menu-master="stores">店舗登録</button>
+      </div>
+    </div>
 
     <main>
       <nav class="tabs" aria-label="主要画面">
-        <button class="tab active" type="button" data-view="shopping">ホーム</button>
-        <button class="tab" type="button" data-view="log">入力</button>
-        <button class="tab" type="button" data-view="inventory">在庫</button>
-        <button class="tab" type="button" data-view="masters">設定</button>
-        <button class="tab" type="button" data-view="analysis">分析</button>
-        <button class="tab" type="button" data-view="share">共有</button>
+        <button class="tab active" type="button" data-view="shopping">買い物リスト</button>
+        <button class="tab" type="button" data-view="log">買い物入力</button>
+        <button class="tab" type="button" data-view="inventory">在庫管理</button>
+        <button class="tab" type="button" data-view="analysis">最安値</button>
       </nav>
 
       <section id="shopping" class="view active" aria-labelledby="shoppingTitle">
@@ -125,11 +134,7 @@
 
       <section id="masters" class="view" aria-labelledby="mastersTitle">
         <h2 id="mastersTitle">商品登録</h2>
-        <div class="segmented">
-          <button class="segment active" type="button" data-master="products">商品</button>
-          <button class="segment" type="button" data-master="stores">店舗</button>
-          <button class="segment" type="button" data-master="units">単位</button>
-        </div>
+        <div id="masterFormBackdrop" class="master-form-backdrop" data-close-master-form></div>
 
         <div id="productsMaster" class="master-view active">
           <form id="productForm" class="panel">
@@ -183,6 +188,15 @@
             <label>
               種別
               <input id="storeType" type="text" placeholder="スーパー・ドラッグストアなど">
+            </label>
+            <label>
+              店舗画像
+              <input id="storeImage" type="file" accept="image/*">
+            </label>
+            <div id="storeImagePreview" class="image-preview empty-preview">画像なし</div>
+            <label class="check-row">
+              <input id="storeImageRemove" type="checkbox">
+              登録済み画像を削除
             </label>
             <label class="check-row">
               <input id="storeFavorite" type="checkbox">
@@ -242,7 +256,7 @@
         </div>
       </section>
     </main>
-    <button id="openShoppingPanel" class="fab" type="button" aria-label="買い物リストに追加">＋</button>
+    <button id="openActionButton" class="fab" type="button" aria-label="追加">＋</button>
 
     <script src="app.js"></script>
   </body>
