@@ -542,6 +542,10 @@ textarea {
   min-width: 150px;
 }
 
+.field-search {
+  width: 100%;
+}
+
 .list {
   display: grid;
   gap: 10px;

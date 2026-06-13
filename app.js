@@ -107,8 +107,13 @@
     const selectedShoppingProduct = byId("shoppingProduct").value;
     const selectedShoppingStore = byId("shoppingStore").value;
     const sortedProducts = [...state.products].sort((a, b) => Number(b.favorite) - Number(a.favorite) || a.name.localeCompare(b.name, "ja"));
+    const purchaseProducts = filterProducts(byId("purchaseProductSearch").value, sortedProducts);
+    const shoppingProducts = filterProducts(byId("shoppingProductSearch").value, sortedProducts);
     const sortedStores = [...state.stores].sort((a, b) => Number(b.favorite) - Number(a.favorite) || a.name.localeCompare(b.name, "ja"));
-    const productOptions = sortedProducts
+    const purchaseProductOptions = purchaseProducts
+      .map((product) => `<option value="${product.id}">${escapeHtml(product.name)}</option>`)
+      .join("");
+    const shoppingProductOptions = shoppingProducts
       .map((product) => `<option value="${product.id}">${escapeHtml(product.name)}</option>`)
       .join("");
     const storeOptions = sortedStores
@@ -118,19 +123,31 @@
       .map((unit) => `<option value="${unit.id}">${escapeHtml(unit.name)} / ${unit.base}${escapeHtml(unit.name)}基準</option>`)
       .join("");
 
-    byId("purchaseProduct").innerHTML = productOptions
-      ? `<option value="">商品を選択</option>${productOptions}`
-      : "<option value=\"\">先に商品を登録</option>";
+    byId("purchaseProduct").innerHTML = purchaseProductOptions
+      ? `<option value="">商品を選択</option>${purchaseProductOptions}`
+      : `<option value="">${state.products.length ? "条件に合う商品なし" : "先に商品を登録"}</option>`;
     byId("purchaseStore").innerHTML = storeOptions || "<option value=\"\">先に店舗を登録</option>";
-    byId("shoppingProduct").innerHTML = `<option value="">メモ商品として追加</option>${productOptions}`;
+    byId("shoppingProduct").innerHTML = `<option value="">メモ商品として追加</option>${shoppingProductOptions}`;
     byId("shoppingStore").innerHTML = `<option value="">最安値店舗に任せる</option>${storeOptions}`;
     byId("productUnit").innerHTML = unitOptions;
-    byId("purchaseProduct").value = selectedPurchaseProduct && sortedProducts.some((product) => product.id === selectedPurchaseProduct)
+    byId("purchaseProduct").value = selectedPurchaseProduct && purchaseProducts.some((product) => product.id === selectedPurchaseProduct)
       ? selectedPurchaseProduct
       : "";
     byId("purchaseStore").value = selectedPurchaseStore || getRecentStoreId() || sortedStores[0]?.id || "";
-    byId("shoppingProduct").value = selectedShoppingProduct;
+    byId("shoppingProduct").value = selectedShoppingProduct && shoppingProducts.some((product) => product.id === selectedShoppingProduct)
+      ? selectedShoppingProduct
+      : "";
     byId("shoppingStore").value = selectedShoppingStore;
+  }
+
+  function filterProducts(keyword, products = state.products) {
+    const normalizedKeyword = keyword.trim().toLowerCase();
+    if (!normalizedKeyword) return products;
+
+    return products.filter((product) => {
+      const haystack = `${product.name || ""} ${product.category || ""}`.toLowerCase();
+      return haystack.includes(normalizedKeyword);
+    });
   }
 
   function renderPurchases() {
@@ -198,8 +215,10 @@
   }
 
   function renderProducts() {
-    byId("productList").innerHTML = state.products.length
-      ? state.products.map((product) => {
+    const products = filterProducts(byId("productSearch").value, state.products)
+      .sort((a, b) => Number(b.favorite) - Number(a.favorite) || a.name.localeCompare(b.name, "ja"));
+    byId("productList").innerHTML = products.length
+      ? products.map((product) => {
           const unit = unitById(product.unitId);
           return `
           <article class="item">
@@ -220,7 +239,7 @@
             </article>
           `;
         }).join("")
-      : "<div class=\"empty\">商品を登録してください。</div>";
+      : `<div class="empty">${state.products.length ? "条件に合う商品はありません。" : "商品を登録してください。"}</div>`;
   }
 
   function renderInventory() {
@@ -470,6 +489,7 @@
     const selectedStore = byId("purchaseStore").value;
     byId("purchaseId").value = "";
     byId("purchaseDate").value = keepDateStore && selectedDate ? selectedDate : today();
+    byId("purchaseProductSearch").value = "";
     byId("purchaseProduct").value = "";
     byId("purchaseQuantity").value = "1";
     byId("purchasePrice").value = "";
@@ -514,6 +534,7 @@
 
   function resetShoppingForm() {
     byId("shoppingProduct").value = "";
+    byId("shoppingProductSearch").value = "";
     byId("shoppingName").value = "";
     byId("shoppingStore").value = "";
   }
@@ -546,7 +567,10 @@
     byId("productForm").addEventListener("submit", saveProduct);
     byId("storeForm").addEventListener("submit", saveStore);
     byId("unitForm").addEventListener("submit", saveUnit);
-    byId("cancelPurchaseEdit").addEventListener("click", resetPurchaseForm);
+    byId("cancelPurchaseEdit").addEventListener("click", () => {
+      resetPurchaseForm();
+      renderAll();
+    });
     byId("cancelProductEdit").addEventListener("click", () => {
       resetProductForm();
       closeMasterForm();
@@ -560,6 +584,12 @@
       closeMasterForm();
     });
     byId("purchaseSearch").addEventListener("input", renderPurchases);
+    byId("purchaseProductSearch").addEventListener("input", () => {
+      renderOptions();
+      renderPurchaseHint();
+    });
+    byId("shoppingProductSearch").addEventListener("input", renderOptions);
+    byId("productSearch").addEventListener("input", renderProducts);
     byId("purchaseProduct").addEventListener("change", renderPurchaseHint);
     byId("shareMode").addEventListener("change", renderShareText);
     byId("productImage").addEventListener("change", handleProductImageSelection);

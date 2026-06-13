@@ -75,6 +75,10 @@
           </div>
           <form id="shoppingForm" class="panel sheet-panel">
           <label>
+            商品検索
+            <input id="shoppingProductSearch" class="field-search" type="search" placeholder="商品名・カテゴリで検索">
+          </label>
+          <label>
             商品
             <select id="shoppingProduct"></select>
           </label>
@@ -103,6 +107,10 @@
           <label>
             購入日
             <input id="purchaseDate" type="date" required>
+          </label>
+          <label>
+            商品検索
+            <input id="purchaseProductSearch" class="field-search" type="search" placeholder="商品名・カテゴリで検索">
           </label>
           <label>
             商品
@@ -204,6 +212,10 @@
               <button id="cancelProductEdit" class="secondary-button" type="button">クリア</button>
             </div>
           </form>
+          <div class="section-row">
+            <h3>商品一覧</h3>
+            <input id="productSearch" class="search" type="search" placeholder="商品名・カテゴリで検索">
+          </div>
           <div id="productList" class="list"></div>
         </div>
 
