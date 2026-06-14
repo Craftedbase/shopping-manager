@@ -62,11 +62,12 @@
       <section id="shopping" class="view" aria-labelledby="shoppingTitle">
         <div class="section-row">
           <h2 id="shoppingTitle">買い物リスト</h2>
-          <div class="section-actions">
-            <button id="clearCheckedItems" class="text-button" type="button">購入済み整理</button>
-          </div>
         </div>
         <div id="shoppingList" class="list"></div>
+        <div id="shoppingCompletionGuide"></div>
+        <div class="shopping-share-actions">
+          <button id="openShoppingShare" class="primary-button share-list-button" type="button">共有</button>
+        </div>
       </section>
 
       <section id="shoppingAddPanel" class="sheet" aria-labelledby="shoppingAddTitle" aria-hidden="true">
@@ -113,6 +114,7 @@
           <button class="tab-button" type="button" data-log-tab="calendar">頻度</button>
         </div>
         <div class="tab-panel active" data-log-panel="input">
+          <div id="purchaseQueue"></div>
           <form id="purchaseForm" class="panel">
             <input type="hidden" id="purchaseId">
             <label>
@@ -343,8 +345,10 @@
           </section>
           <section class="help-block">
             <h3>買い物リスト</h3>
-            <p>買う予定の商品を管理します。在庫が最低在庫以下の商品は自動で表示されます。右下の＋ボタンから手動追加できます。</p>
-            <p>リスト内の「入力」を押すと買物入力へ移動し、商品と店舗候補を引き継げます。保存するとリスト側は購入済みになります。</p>
+            <p>買う予定の商品を管理します。商品マスタに紐づくものは記録対象、その日だけ必要なメモ商品はその日だけとして表示します。</p>
+            <p>記録対象の「記」を押すと買物入力へ移動し、価格を入力して購入ログに残せます。今回は買わないものは「未」であとで買う枠へ移動できます。</p>
+            <p>チェックは買い物中の一時的な印です。買物入力では、チェック済みの記録対象が入力リストとして表示され、未入力と記録済みを確認できます。</p>
+            <p>共有ボタンで、家族へ送るための貼り付け用テキストを作成できます。</p>
           </section>
           <section class="help-block">
             <h3>買い物入力</h3>

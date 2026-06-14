@@ -435,26 +435,73 @@
   function renderShoppingList() {
     ensureAutoShoppingItems();
     const items = getShoppingItemsWithDetails();
+    const activeItems = items.filter((item) => !item.skipped);
+    const recordItems = activeItems.filter((item) => item.productId);
+    const memoItems = activeItems.filter((item) => !item.productId);
+    const laterItems = items.filter((item) => item.skipped);
     byId("shoppingList").innerHTML = items.length
-      ? items.map((item) => `
-          <article class="item ${item.checked ? "checked" : ""}">
+      ? [
+          renderShoppingSection("記録対象", "購入ログ・最安値・購入頻度に使う商品です。", recordItems),
+          renderShoppingSection("その日だけ", "購入ログには残さないメモ商品です。", memoItems),
+          renderShoppingSection("あとで買う", "今回は買わないものです。必要になったら戻せます。", laterItems)
+        ].filter(Boolean).join("")
+      : "<div class=\"empty\">買うものはありません。在庫不足の商品は自動で表示されます。</div>";
+    renderShoppingCompletionGuide(items);
+  }
+
+  function renderShoppingSection(title, description, items) {
+    if (!items.length) return "";
+    return `
+      <section class="shopping-group">
+        <div class="shopping-group-header">
+          <h3>${title}</h3>
+          <p>${description}</p>
+        </div>
+        ${items.map((item) => `
+          <article class="item ${item.checked ? "checked" : ""} ${item.skipped ? "skipped" : ""}">
             <div class="item-header">
               <label class="check-item">
-                <input type="checkbox" ${item.checked ? "checked" : ""} data-toggle-shopping="${item.id}">
+                <input type="checkbox" ${item.checked ? "checked" : ""} ${item.skipped ? "disabled" : ""} data-toggle-shopping="${item.id}">
                 <span>
                   <span class="item-title">${escapeHtml(item.name)}</span>
                   <span class="meta">${escapeHtml(item.storeName)} / ${escapeHtml(item.sourceLabel)}</span>
+                  <span class="shopping-tags">
+                    <span class="badge">${item.productId ? "記録対象" : "メモ"}</span>
+                    ${item.logged ? "<span class=\"badge done\">記録済み</span>" : ""}
+                    ${item.skipped ? "<span class=\"badge muted-badge\">あとで買う</span>" : ""}
+                  </span>
                   ${item.priceLabel ? `<span class="meta">${escapeHtml(item.priceLabel)}</span>` : ""}
                 </span>
               </label>
               <div class="item-actions">
-                <button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="買物入力へ">記</button>
+                ${item.productId && !item.logged ? `<button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="買物入力へ">記</button>` : ""}
+                <button class="mini-button" type="button" data-skip-shopping="${item.id}" aria-label="${item.skipped ? "未購入を解除" : "未購入にする"}">${item.skipped ? "戻" : "未"}</button>
                 <button class="mini-button danger" type="button" data-delete-shopping="${item.id}" aria-label="削除">削</button>
               </div>
             </div>
           </article>
-        `).join("")
-      : "<div class=\"empty\">買うものはありません。在庫不足の商品は自動で表示されます。</div>";
+        `).join("")}
+      </section>
+    `;
+  }
+
+  function renderShoppingCompletionGuide(items) {
+    const activeItems = items.filter((item) => !item.skipped);
+    const shouldShowGuide = activeItems.length > 0 && activeItems.every((item) => item.checked);
+    const unloggedRecordCount = activeItems.filter((item) => item.checked && item.productId && !item.logged).length;
+    const memoCount = activeItems.filter((item) => item.checked && !item.productId).length;
+    const skippedCount = items.filter((item) => item.skipped).length;
+    byId("shoppingCompletionGuide").innerHTML = shouldShowGuide
+      ? `
+        <div class="completion-guide">
+          <p>買い物リストがすべてチェックされました。記録対象は購入ログ入力、その後に在庫更新を行ってください。</p>
+          <p class="completion-summary">購入ログ未入力: ${unloggedRecordCount}件 / その日だけ: ${memoCount}件 / あとで買う: ${skippedCount}件</p>
+          ${unloggedRecordCount ? "<button class=\"secondary-button\" type=\"button\" data-start-purchase-logging>購入ログ入力へ進む</button>" : ""}
+          <button class="primary-button" type="button" data-open-inventory>在庫管理へ進む</button>
+          ${memoCount ? "<button class=\"text-button\" type=\"button\" data-clear-checked-memo>その日だけの商品を片付ける</button>" : ""}
+        </div>
+      `
+      : "";
   }
 
   function renderPurchaseItem(purchase) {
@@ -478,6 +525,31 @@
         <p class="price">${money(purchase.price)}</p>
       </article>
     `;
+  }
+
+  function renderPurchaseQueue() {
+    const items = getShoppingItemsWithDetails().filter((item) => item.checked && item.productId);
+    byId("purchaseQueue").innerHTML = items.length
+      ? `
+        <div class="purchase-queue">
+          <div class="shopping-group-header">
+            <h3>購入ログ入力リスト</h3>
+            <p>買い物リストでチェックした記録対象です。未入力の商品から順に価格を入力してください。</p>
+          </div>
+          ${items.map((item) => `
+            <article class="queue-item ${item.logged ? "done" : ""} ${linkedShoppingItemId === item.id ? "active" : ""}">
+              <div>
+                <p class="item-title">${escapeHtml(item.name)}</p>
+                <p class="meta">${escapeHtml(item.storeName)} / ${item.logged ? "記録済み" : "未入力"}</p>
+              </div>
+              ${item.logged
+                ? "<span class=\"badge done\">済</span>"
+                : `<button class="mini-button" type="button" data-input-shopping="${item.id}" aria-label="この商品を入力">記</button>`}
+            </article>
+          `).join("")}
+        </div>
+      `
+      : "";
   }
 
   function renderProducts() {
@@ -809,6 +881,7 @@
     const byStore = new Map();
     getShoppingItemsWithDetails()
       .filter((item) => !item.checked)
+      .filter((item) => !item.skipped)
       .forEach((item) => {
       const storeName = item.storeName || "店舗未定";
       if (!byStore.has(storeName)) byStore.set(storeName, []);
@@ -838,6 +911,7 @@
   function renderAll() {
     renderOptions();
     renderShoppingList();
+    renderPurchaseQueue();
     renderPurchases();
     renderInventory();
     renderProducts();
@@ -975,7 +1049,7 @@
     byId("storeImage").addEventListener("change", handleStoreImageSelection);
     byId("copyShareText").addEventListener("click", copyShareText);
     byId("nativeShare").addEventListener("click", nativeShare);
-    byId("clearCheckedItems").addEventListener("click", clearCheckedShoppingItems);
+    byId("openShoppingShare").addEventListener("click", openShoppingShare);
     byId("exportBackup").addEventListener("click", exportBackup);
     byId("importBackup").addEventListener("change", importBackup);
     byId("loadSampleData").addEventListener("click", loadSampleData);
@@ -1074,9 +1148,14 @@
 
     if (linkedItemId) {
       const linkedItem = state.shoppingItems.find((item) => item.id === linkedItemId);
-      if (linkedItem) linkedItem.checked = true;
+      if (linkedItem) {
+        linkedItem.checked = true;
+        linkedItem.logged = true;
+        linkedItem.loggedAt = new Date().toISOString();
+      }
     }
 
+    const nextShoppingItemId = linkedItemId ? getNextUnloggedShoppingItemId(linkedItemId) : "";
     saveState();
     resetPurchaseForm({
       keepDateStore: isContinuous,
@@ -1088,6 +1167,10 @@
         ? "保存しました。買い物リストを購入済みにしました。"
         : "保存しました。";
     renderAll();
+    if (nextShoppingItemId) {
+      fillPurchaseFromShoppingItem(nextShoppingItemId);
+      byId("purchaseStatus").textContent = "保存しました。次の商品を続けて入力できます。";
+    }
   }
 
   function saveShoppingItem(event) {
@@ -1199,8 +1282,19 @@
     const toggleShopping = target.dataset.toggleShopping;
     const deleteShopping = target.dataset.deleteShopping;
     const inputShopping = target.dataset.inputShopping;
+    const skipShopping = target.dataset.skipShopping;
+    const openInventory = target.dataset.openInventory;
+    const startPurchaseLogging = target.dataset.startPurchaseLogging;
+    const clearCheckedMemo = target.dataset.clearCheckedMemo;
 
+    if (openInventory !== undefined) {
+      setTab("inventory", "stock");
+      return switchView("inventory");
+    }
+    if (startPurchaseLogging !== undefined) return startPurchaseLoggingFromShoppingList();
+    if (clearCheckedMemo !== undefined) return clearCheckedMemoItems();
     if (inputShopping) return fillPurchaseFromShoppingItem(inputShopping);
+    if (skipShopping) return toggleSkippedShoppingItem(skipShopping);
     if (toggleShopping) return toggleShoppingItem(toggleShopping, target.checked);
     if (deleteShopping) return removeShoppingItem(deleteShopping);
     if (editPurchase) return fillPurchaseForm(editPurchase);
@@ -1234,6 +1328,7 @@
     const before = Number(product.stock || 0);
     product.stock = Math.max(0, before + step);
     recordStockHistory(product, before, product.stock, step > 0 ? "在庫を追加" : "在庫を減少");
+    if (before !== product.stock) resetCompletedShoppingItemsAfterInventoryUpdate();
     saveState();
     renderAll();
   }
@@ -1246,6 +1341,7 @@
     product[key] = after;
     if (key === "stock") {
       recordStockHistory(product, before, after, "在庫数を編集");
+      if (before !== after) resetCompletedShoppingItemsAfterInventoryUpdate();
     }
     saveState();
     renderAll();
@@ -1310,6 +1406,7 @@
     }
 
     switchView("log");
+    setTab("log", "input");
     resetPurchaseForm();
     linkedShoppingItemId = id;
     byId("purchaseDate").value = today();
@@ -1320,15 +1417,22 @@
     byId("purchaseQuantity").value = "1";
     byId("purchasePrice").value = "";
     byId("purchaseNote").value = item.source === "auto" ? "買い物リストから入力" : "";
+    byId("purchaseContinuous").checked = false;
     byId("purchaseStatus").textContent = "買い物リストから入力中です。保存すると購入済みにします。";
     renderPurchaseHint();
+    renderPurchaseQueue();
     setTimeout(() => byId("purchasePrice").focus(), 0);
   }
 
   function toggleShoppingItem(id, checked) {
     const item = state.shoppingItems.find((entry) => entry.id === id);
     if (!item) return;
+    if (item.skipped) return;
     item.checked = checked;
+    if (!checked) {
+      item.logged = false;
+      item.loggedAt = "";
+    }
     saveState();
     renderAll();
   }
@@ -1339,13 +1443,56 @@
     renderAll();
   }
 
-  function clearCheckedShoppingItems() {
-    state.shoppingItems = state.shoppingItems.filter((item) => !item.checked || item.source === "auto");
-    state.shoppingItems.forEach((item) => {
-      if (item.source === "auto" && item.checked) item.checked = false;
-    });
+  function toggleSkippedShoppingItem(id) {
+    const item = state.shoppingItems.find((entry) => entry.id === id);
+    if (!item) return;
+    item.skipped = !item.skipped;
+    if (item.skipped) {
+      item.checked = false;
+      item.logged = false;
+      item.loggedAt = "";
+    }
     saveState();
     renderAll();
+  }
+
+  function resetCompletedShoppingItemsAfterInventoryUpdate() {
+    state.shoppingItems = state.shoppingItems.filter((item) => {
+      if (item.skipped) return true;
+      if (!item.checked) return true;
+      if (!item.productId) return false;
+      if (item.logged) return item.source === "auto";
+      return true;
+    });
+    state.shoppingItems.forEach((item) => {
+      if (item.source === "auto" && item.checked && item.logged) {
+        item.checked = false;
+        item.logged = false;
+        item.loggedAt = "";
+      }
+    });
+  }
+
+  function startPurchaseLoggingFromShoppingList() {
+    const item = getShoppingItemsWithDetails().find((entry) => entry.checked && entry.productId && !entry.logged && !entry.skipped);
+    if (!item) {
+      alert("購入ログ未入力の商品はありません。");
+      return;
+    }
+    fillPurchaseFromShoppingItem(item.id);
+  }
+
+  function clearCheckedMemoItems() {
+    const shouldClear = confirm("チェック済みの「その日だけ」の商品を買い物リストから片付けます。よろしいですか？");
+    if (!shouldClear) return;
+    state.shoppingItems = state.shoppingItems.filter((item) => item.skipped || item.productId || !item.checked);
+    saveState();
+    renderAll();
+  }
+
+  function getNextUnloggedShoppingItemId(currentId) {
+    return getShoppingItemsWithDetails()
+      .find((item) => item.id !== currentId && item.checked && item.productId && !item.logged && !item.skipped)?.id || "";
   }
 
   function openActionPanel() {
@@ -1591,6 +1738,12 @@
       return;
     }
     await navigator.share({ title: "買い物リスト", text });
+  }
+
+  function openShoppingShare() {
+    byId("shareMode").value = "shopping";
+    renderShareText();
+    switchView("share");
   }
 
   function exportBackup(options = {}) {
